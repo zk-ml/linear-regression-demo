@@ -1,0 +1,20 @@
+{
+  "name": "circuits",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "circom": "^0.5.34",
+    "circomlib": "^0.2.4",
+    "dotenv": "^8.2.0",
+    "snarkjs": "https://github.com/justinglibert/snarkjs.git"
+  },
+  "scripts": {
+    "prepare": "exit 0",
+    "test": "exit 0",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "dev": "node builder.js dfs,path,touch_and_perlin,touch,special_region ../client/src/Circuits ../client/src/Circuits ../eth/contracts/libraries true",
+    "prod": "node builder.js dfs,path,touch_and_perlin,touch,special_region ../client/src/Circuits ../client/src/Circuits ../eth/contracts/libraries false"
+  }
+}

@@ -29,7 +29,7 @@ async function run() {
     warn: console.log,
     error: console.log,
   };
-  
+
   const cwd = process.cwd();
 
   for (circuitName of circuitsList.split(",")) {
@@ -83,8 +83,11 @@ async function run() {
     if (!verified) throw new Error("Could not verify the proof");
 
     if (process.argv.length !== 3) {
-
-      const circuit_sol = await snarkjs.zKey.exportSolidityVerifier(final_zkey, theirTemplate, logger);
+      const templates = {};
+      templates.groth16 = await fs.promises.readFile("node_modules/snarkjs/templates/verifier_groth16.sol.ejs", "utf8");
+      templates.plonk = await fs.promises.readFile("node_modules/snarkjs/templates/verifier_plonk.sol.ejs", "utf8");  
+      const circuit_sol = await snarkjs.zKey.exportSolidityVerifier(final_zkey, templates, logger);
+      console.log(circuit_sol);
       const path = cwd + "/" + wasmOutPath + "/" + snakeToCamel(circuitName) 
       fs.writeFileSync(
         path + "/" + snakeToCamel(circuitName) + ".wasm",

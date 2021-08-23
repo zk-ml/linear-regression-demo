@@ -29,11 +29,7 @@ async function run() {
     warn: console.log,
     error: console.log,
   };
-
-  let finalsol1 = fs.readFileSync("LibVerifier1.sol.template").toString();
-  let finalsol2 = fs.readFileSync("LibVerifier2.sol.template").toString();
-  let finalsol3 = fs.readFileSync("LibVerifier3.sol.template").toString();
-
+  
   const cwd = process.cwd();
 
   for (circuitName of circuitsList.split(",")) {
@@ -87,15 +83,6 @@ async function run() {
     if (!verified) throw new Error("Could not verify the proof");
 
     if (process.argv.length !== 3) {
-      var enc = new TextEncoder();
-      const theirTemplate = enc.encode(`
-    vk.alfa1 = LibPairing.G1Point(<%vk_alpha1%>);
-    vk.beta2 = LibPairing.G2Point(<%vk_beta2%>);
-    vk.gamma2 = LibPairing.G2Point(<%vk_gamma2%>);
-    vk.delta2 = LibPairing.G2Point(<%vk_delta2%>);
-    vk.IC = new LibPairing.G1Point[](<%vk_ic_length%>);
-    <%vk_ic_pts%>
-    `);
 
       const circuit_sol = await snarkjs.zKey.exportSolidityVerifier(final_zkey, theirTemplate, logger);
       const path = cwd + "/" + wasmOutPath + "/" + snakeToCamel(circuitName) 
@@ -115,26 +102,9 @@ async function run() {
         cwd + "/artifacts/" + snakeToCamel(circuitName) + ".zkey",
         final_zkey.data
       );
-      require('child_process').execSync(`cd ${path} && split -b50m ${snakeToCamel(circuitName) + ".zkey"} ${snakeToCamel(circuitName) + ".zkey."}`)
-      require('child_process').execSync(`cd ${path} && rm ${snakeToCamel(circuitName) + ".zkey"}`)
-      // add new circuits to this array, we already too big for Verifier1
-      if(["path"].includes(circuitName)){
-        finalsol2 = finalsol2.replace("{{" + snakeToCamel(circuitName) + "VerifyingKey}}", circuit_sol)
-        finalsol2 = finalsol2.replace(/= Pairing/g, "= LibPairing");
-      } else if(["dfs"].includes(circuitName)) {
-        finalsol3 = finalsol3.replace("{{" + snakeToCamel(circuitName) + "VerifyingKey}}", circuit_sol)
-        finalsol3 = finalsol3.replace(/= Pairing/g, "= LibPairing");
-      } else {
-        finalsol1 = finalsol1.replace("{{" + snakeToCamel(circuitName) + "VerifyingKey}}", circuit_sol)
-        finalsol1 = finalsol1.replace(/= Pairing/g, "= LibPairing");
-      }
+      
+      fs.writeFileSync(cwd + "/" + verifierOutPath + "/LibVerifier.sol", circuit_sol);
     }
-  }
-
-  if (process.argv.length !== 3) {
-    fs.writeFileSync(cwd + "/" + verifierOutPath + "/LibVerifier1.sol", finalsol1);
-    fs.writeFileSync(cwd + "/" + verifierOutPath + "/LibVerifier2.sol", finalsol2);
-    fs.writeFileSync(cwd + "/" + verifierOutPath + "/LibVerifier3.sol", finalsol3);
   }
 }
 

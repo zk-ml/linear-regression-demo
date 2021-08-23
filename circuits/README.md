@@ -6,8 +6,7 @@ For your convenience, a sample `input.json` and `public.json` pair is included f
 
 ## Local builds
 
-1. copy `.env.example` to `.env` and set beacon entropies.
-2. `yarn dev` regenerates development version after touching circuit files
+1. `yarn dev` regenerates development version after touching circuit files
 
 ## Production builds
 

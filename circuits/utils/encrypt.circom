@@ -1,4 +1,4 @@
-include "../circomlib/circuits/mimc.circom"
+include "../node_modules/circomlib/circuits/mimc.circom"
 include "./ecdh.circom"
 
 template EncryptBits(N) {

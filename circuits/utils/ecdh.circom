@@ -1,5 +1,5 @@
-include "../circomlib/circuits/bitify.circom";
-include "../circomlib/circuits/escalarmulany.circom";
+include "../node_modules/circomlib/circuits/bitify.circom";
+include "../node_modules/circomlib/circuits/escalarmulany.circom";
 
 
 template Ecdh() {

@@ -1,10 +1,10 @@
-include "./circomlib/circuits/comparators.circom";
-include "./circomlib/circuits/switcher.circom";
-include "./circomlib/circuits/sign.circom"
-include "./circomlib/circuits/bitify.circom"
+include "../node_modules/circomlib/circuits/comparators.circom";
+include "../node_modules/circomlib/circuits/switcher.circom";
+include "../node_modules/circomlib/circuits/sign.circom"
+include "../node_modules/circomlib/circuits/bitify.circom"
 
-include "./utils/encrypt.circom";
-include "./utils/ecdh.circom";
+include "../utils/encrypt.circom";
+include "../utils/ecdh.circom";
 
 // NB: RangeProof is inclusive.
 // input: field element, whose abs is claimed to be less than max_abs_value

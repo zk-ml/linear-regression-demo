@@ -79,7 +79,7 @@ async function run() {
     const { proof, publicSignals } = await snarkjs.groth16.prove(final_zkey, wtns, logger);
     console.log("Proof took " + (Date.now() - start) / 1000 + " s");
 
-    const call_data = snarkjs.groth16.exportSolidityCallData(proof, publicSignals);
+    const call_data = await snarkjs.groth16.exportSolidityCallData(proof, publicSignals);
     console.log(call_data);
 
     const verified = await snarkjs.groth16.verify(verification_key, publicSignals, proof, logger);

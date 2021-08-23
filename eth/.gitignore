@@ -14,3 +14,9 @@ typechain/factories
 #Hardhat files
 cache
 artifacts
+node_modules
+.env
+
+#Hardhat files
+cache
+artifacts

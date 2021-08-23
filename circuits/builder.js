@@ -80,7 +80,11 @@ async function run() {
     console.log("Proof took " + (Date.now() - start) / 1000 + " s");
 
     const call_data = await snarkjs.groth16.exportSolidityCallData(proof, publicSignals);
-    console.log(call_data);
+    fs.writeFileSync(
+        cwd + "/sample_input.json",
+        call_data
+      );
+    //console.log(call_data);
 
     const verified = await snarkjs.groth16.verify(verification_key, publicSignals, proof, logger);
     if (!verified) throw new Error("Could not verify the proof");

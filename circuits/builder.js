@@ -98,7 +98,7 @@ async function run() {
 
       const zkey_path = path + "/" + snakeToCamel(circuitName) + ".zkey";
 
-      const circuit_sol = await snarkjs.exportSolidityVerifier(zkey_path, templates, logger);
+      const circuit_sol = await snarkjs.zKey.exportSolidityVerifier(zkey_path, templates, logger);
       //console.log(circuit_sol);
       fs.writeFileSync(
         path + "/" + snakeToCamel(circuitName) + ".wasm",

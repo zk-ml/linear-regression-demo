@@ -7,7 +7,7 @@
     "circom": "^0.5.34",
     "circomlib": "^0.2.4",
     "dotenv": "^8.2.0",
-    "snarkjs": "https://github.com/justinglibert/snarkjs.git"
+    "snarkjs": "https://github.com/iden3/snarkjs.git"
   },
   "scripts": {
     "prepare": "exit 0",

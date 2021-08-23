@@ -84,18 +84,25 @@ async function run() {
 
     if (process.argv.length !== 3) {
       const templates = {};
-      templates.groth16 = await fs.promises.readFile("node_modules/snarkjs/templates/verifier_groth16.sol.ejs", "utf8");
-      templates.plonk = await fs.promises.readFile("node_modules/snarkjs/templates/verifier_plonk.sol.ejs", "utf8");  
-      const circuit_sol = await snarkjs.zKey.exportSolidityVerifier(final_zkey, templates, logger);
-      console.log(circuit_sol);
+      templates.groth16 = await fs.promises.readFile(cwd+"/templates/verifier_groth16.sol.ejs", "utf8");
+      templates.plonk = await fs.promises.readFile(cwd+"/templates/verifier_plonk.sol.ejs", "utf8");  
+      //const template = cwd+"/templates/verifier_groth16.sol.ejs";
+      //console.log(templates);
+      //console.log(final_zkey);
       const path = cwd + "/" + wasmOutPath + "/" + snakeToCamel(circuitName) 
-      fs.writeFileSync(
-        path + "/" + snakeToCamel(circuitName) + ".wasm",
-        wasm
-      );
+
       fs.writeFileSync(
         path + "/" + snakeToCamel(circuitName) + ".zkey",
         final_zkey.data
+      );
+
+      const zkey_path = path + "/" + snakeToCamel(circuitName) + ".zkey";
+
+      const circuit_sol = await snarkjs.exportSolidityVerifier(zkey_path, templates, logger);
+      //console.log(circuit_sol);
+      fs.writeFileSync(
+        path + "/" + snakeToCamel(circuitName) + ".wasm",
+        wasm
       );
       fs.writeFileSync(
         cwd + "/artifacts/" + snakeToCamel(circuitName) + ".wasm",

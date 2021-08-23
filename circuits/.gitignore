@@ -1,0 +1,12 @@
+**/proof.json
+**/*.r1cs
+**/*.sym
+**/*.wasm
+**/*.zkey
+**/*.zkey
+**/public.json
+**/verification_key.json
+**/verifier.sol
+**/witness.wtns
+pot*
+*.ptau

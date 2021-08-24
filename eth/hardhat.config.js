@@ -208,7 +208,10 @@ task("claim_bounty", "Claim bounty")
 
     console.log([arg0, arg1, arg2, arg3]);
     console.log("Paying " + taskArgs.paymentAddr);
-    contract.methods.collectBounty(taskArgs.paymentAddr, arg0, arg1, arg2, arg3).send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30'})
+    await contract.methods.collectBounty(taskArgs.paymentAddr, arg0, arg1, arg2, arg3).send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30'}, function(error, transactionHash){
+      console.log(error);
+      console.log(transactionHash);
+    });
   
     console.log("Your Public Key: ");
     console.log(key1.pubKey.rawPubKey);
@@ -217,7 +220,7 @@ task("claim_bounty", "Claim bounty")
     console.log("Success!");
   });
 
-task("deposit_bounty", "Deposit bounty")
+task("add_bounty", "Deposit bounty")
   .setAction(async (taskArgs) => {
 
     const { execSync } = require("child_process");
@@ -307,6 +310,17 @@ task("deposit_bounty", "Deposit bounty")
     console.log(key.pubKey.rawPubKey);
     console.log("Your Private Key: ");
     console.log(key.privKey.rawPrivKey);
+
+    const contract_interface = JSON.parse(fs.readFileSync("artifacts/contracts/libraries/BountyManager.sol/BountyManager.json")).abi;
+    var contract = new web3.eth.Contract(contract_interface, CONTRACT_ADDRESS, {
+      from: '0x1234567890123456789012345678901234567891', // default from address
+      gasPrice: '20000000000' // default gas price in wei, 20 gwei in this case
+    });
+
+    await contract.methods.addBounty(hash_input, data.out).send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30'}, function(error, transactionHash){
+      console.log(error);
+      console.log(transactionHash);
+    });
 
     console.log("Success!");
   });

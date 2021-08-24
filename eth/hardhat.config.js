@@ -8,6 +8,8 @@ require("@nomiclabs/hardhat-web3");
 require("maci-domainobjs");
 require("maci-crypto");
 
+const CONTRACT_ADDRESS = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
+
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
@@ -182,8 +184,6 @@ task("claim_bounty", "Claim bounty")
         error: console.log,
     };
 
-    const cwd = process.cwd();
-
     const verification_key = await snarkjs.zKey.exportVerificationKey(final_zkey);
     await snarkjs.wtns.calculate(input, wasm, wtns, logger);
     const start = Date.now();
@@ -195,6 +195,15 @@ task("claim_bounty", "Claim bounty")
 
     const call_data = await snarkjs.groth16.exportSolidityCallData(proof, publicSignals);
 
+    const contract_interface = JSON.parse(fs.readFileSync("artifacts/contracts/libraries/BountyManager.sol/BountyManager.json")).abi;
+    var contract = new web3.eth.Contract(contract_interface, CONTRACT_ADDRESS, {
+      from: '0x1234567890123456789012345678901234567891', // default from address
+      gasPrice: '20000000000' // default gas price in wei, 20 gwei in this case
+    });
+
+    //console.log(JSON.parse(call_data));
+    contract.methods.collectBounty(call_data).send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30'})
+  
     console.log("Your Public Key: ");
     console.log(key1.pubKey.rawPubKey);
     console.log("Your Private Key: ");

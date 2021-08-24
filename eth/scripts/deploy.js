@@ -4,6 +4,7 @@
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
+require("@nomiclabs/hardhat-web3");
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -14,12 +15,14 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const Greeter = await hre.ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
+  const BountyManager = await hre.ethers.getContractFactory("BountyManager");
+  const bm = await BountyManager.deploy();
 
-  await greeter.deployed();
+  await bm.deployed();
 
-  console.log("Greeter deployed to:", greeter.address);
+  await web3.eth.sendTransaction({from: "0x71bE63f3384f5fb98995898A86B02Fb2426c5788", to: bm.address, value: web3.utils.toWei("1", "ether")})
+  
+  console.log("Greeter deployed to:", bm.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -9,7 +9,7 @@ require("@nomiclabs/hardhat-web3");
 require("maci-domainobjs");
 require("maci-crypto");
 
-const CONTRACT_ADDRESS = "0x4EE6eCAD1c2Dae9f525404De8555724e3c35d07B";
+const CONTRACT_ADDRESS = "0x1c85638e118b37167e9298c2268758e058DdfDA0";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -42,8 +42,38 @@ task("list_bounties", "List bounties")
 
     const write_contract = contract.connect(wallet);
 
+    var alias = await write_contract.get_alias(taskArgs.datasetHash);
+
+    console.log("Available bounties on dataset: " + alias);
     tx = await write_contract.query_bounties(taskArgs.datasetHash);
-    console.log(tx);  
+    const bounties = tx.map(function (x) { 
+      return {"PublicKey-1": x[0].toString(), "PublicKey-2": x[1].toString(), "MSE-Cap":  x[2].toString()}; 
+    });
+    console.log(bounties);  
+  });
+
+  task("list_datasets", "List of datasets with alias")
+  .setAction(async (taskArgs) => {
+    const fs = require("fs");
+    const provider = new ethers.providers.JsonRpcProvider();
+    const contract_interface = JSON.parse(fs.readFileSync("artifacts/contracts/libraries/BountyManager.sol/BountyManager.json")).abi;
+    var contract = new hre.ethers.Contract(CONTRACT_ADDRESS, contract_interface, provider);
+
+    wallet = await hre.ethers.getSigner();
+
+    const write_contract = contract.connect(wallet);
+
+    tx = await write_contract.query_datasets();
+    
+    const hashes = tx.map(function (x) { return x.toString() });
+    const aliases = await Promise.all(tx.map(async function (hash) {
+      var alias = await write_contract.get_alias(hash);
+      return alias;
+    }));
+    
+    console.log("Available datasets:");
+    console.log(hashes);  
+    console.log(aliases);
   });
 
 task("claim_bounty", "Claim bounty")
@@ -352,7 +382,7 @@ task("add_bounty", "Deposit bounty")
 
     const write_contract = contract.connect(wallet);
 
-    tx = await write_contract.addBounty(hash_input, key.pubKey.rawPubKey, data.out);
+    tx = await write_contract.addBounty(hash_input, "dataset", key.pubKey.rawPubKey, data.out);
     console.log(tx);
 
     console.log(hash_input);

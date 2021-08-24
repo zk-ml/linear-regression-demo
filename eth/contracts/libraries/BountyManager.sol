@@ -24,7 +24,33 @@ contract BountyManager is Verifier {
   mapping(uint256 => KeysPerf[]) public public_keys;
   mapping(uint256 => uint256) length;
 
-  
+  mapping(uint256 => string) public dataset_alias;
+
+  uint256[] list_bounties;
+  uint256 length_list_bounties;
+  mapping(uint256 => uint256) indexOf;
+
+  function add(uint256 value) public {
+        if (indexOf[value] == 0) {
+            list_bounties.push(value);
+            length_list_bounties = length_list_bounties + 1;
+            indexOf[value] = length_list_bounties;
+        }
+  }
+
+  function remove(uint256 value) public {
+      uint256 index = indexOf[value];
+
+      require(index > 0);
+
+      // move the last item into the index being vacated
+      uint256 lastValue = list_bounties[length_list_bounties - 1];
+      list_bounties[index - 1] = lastValue;  // adjust for 1-based indexing
+      indexOf[lastValue] = index;
+
+      length_list_bounties -= 1;
+      indexOf[value] = 0;
+  }
 
   // 1-based indexing into the array. 0 represents non-existence.
   mapping(uint256 => mapping(uint256 => mapping(uint256 => uint256))) bountyIndexOf;
@@ -68,10 +94,22 @@ contract BountyManager is Verifier {
     //emit AvailableBounties(mse_caps, pbkeys_1, pbkeys_2);
   }
 
-  function addBounty(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) public payable {
+  function query_datasets() public view returns (uint256[] memory) {
+    return list_bounties;
+  }
+
+  function get_alias(uint256 dataset_hash) public view returns (string memory) {
+    return dataset_alias[dataset_hash];
+  }
+
+  function addBounty(uint256 dataset_hash, string memory alias_dataset, uint256[2] memory public_key, uint256 mse_cap) public payable {
+    if (length[dataset_hash] == 0) {
+      add(dataset_hash);
+    }
     if (bounties[dataset_hash][public_key[0]][public_key[1]][mse_cap] == 0) {
       add_bounty(dataset_hash, [public_key[0], public_key[1], mse_cap]);
     }
+    dataset_alias[dataset_hash] = alias_dataset;
     bounties[dataset_hash][public_key[0]][public_key[1]][mse_cap] += msg.value;
   }
 
@@ -91,6 +129,9 @@ contract BountyManager is Verifier {
       uint256 mse_cap = input[0];
       uint256 topay = bounties[dataset_hash][public_key_0][public_key_1][mse_cap];
       remove_bounty(dataset_hash, [public_key_0, public_key_1, mse_cap]);
+      if (length[dataset_hash] == 0) {
+        remove(dataset_hash);
+      }
       bounties[dataset_hash][public_key_0][public_key_1][mse_cap] = 0;
       to.transfer(topay);
   }

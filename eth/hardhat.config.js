@@ -324,7 +324,7 @@ task("add_bounty", "Deposit bounty")
       gasPrice: '20000000000' // default gas price in wei, 20 gwei in this case
     });
 
-    await contract.methods.addBounty(hash_input, data.out).send({value: web3.utils.toWei(taskArgs.amount, "ether"), from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
+    await contract.methods.addBounty(hash_input, data.publicKey, data.out).send({value: web3.utils.toWei(taskArgs.amount, "ether"), from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
       console.log(error);
       console.log(transactionHash);
       const receipt = await web3.eth.getTransactionReceipt(transactionHash);
@@ -340,7 +340,7 @@ task("add_bounty", "Deposit bounty")
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.6.11",
+  solidity: "0.8.0",
   networks: {
     hardhat: {
       initialBaseFeePerGas: 0, // workaround from https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136 . Remove when that issue is closed.

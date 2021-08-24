@@ -1,4 +1,4 @@
-pragma solidity >=0.6.0 <0.9.0;
+pragma solidity >=0.8.0 <0.9.0;
 pragma experimental ABIEncoderV2;
 //SPDX-License-Identifier: MIT
 
@@ -7,20 +7,26 @@ import "hardhat/console.sol";
 
 contract BountyManager is Verifier {
 
+  struct KeysPerf {
+    uint256 k1;
+    uint256 k2;
+    uint256 mse;
+  }
+
   event SetPurpose(address sender, string purpose);
 
   mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => uint256)))) public bounties;
 
   uint256[3] public queryResult;
 
-  mapping(uint256 => uint256[][3]) public public_keys;
+  mapping(uint256 => KeysPerf[]) public public_keys;
   // 1-based indexing into the array. 0 represents non-existence.
   mapping(uint256 => mapping(uint256 => mapping(uint256 => uint256))) indexOf;
 
   function add(uint256 dataset_hash, uint256[3] memory value) public {
       if (indexOf[value[0]][value[1]][value[2]] == 0) {
-          public_keys[dataset_hash].push(value);
-          indexOf[value] = public_keys.length;
+          public_keys[dataset_hash].push(KeysPerf(value[0], value[1], value[2]));
+          indexOf[value[0]][value[1]][value[2]] = public_keys[dataset_hash].length;
       }
   }
 
@@ -30,9 +36,9 @@ contract BountyManager is Verifier {
       require(index > 0);
 
       // move the last item into the index being vacated
-      uint256 lastValue = public_keys[dataset_hash][public_keys.length - 1];
+      KeysPerf memory lastValue = public_keys[dataset_hash][public_keys[dataset_hash].length - 1];
       public_keys[dataset_hash][index - 1] = lastValue;  // adjust for 1-based indexing
-      indexOf[lastValue[0]][lastValue[1]][lastValue[2]] = index;
+      indexOf[lastValue.k1][lastValue.k2][lastValue.mse] = index;
 
       public_keys[dataset_hash].length -= 1;
       indexOf[value[0]][value[1]][value[2]] = 0;
@@ -50,7 +56,7 @@ contract BountyManager is Verifier {
   function addBounty(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) public payable {
     bounties[dataset_hash][public_key[0]][public_key[1]][mse_cap] += msg.value;
     
-    add([public_key[0], public_key[1], mse_cap]);
+    add([public_key[0], public_key[1], mse_cap], dataset_hash);
   }
 
   function collectBounty(
@@ -66,7 +72,7 @@ contract BountyManager is Verifier {
       uint256 dataset_hash = input[1];
       uint256 mse_cap = input[0];
       uint256 topay = bounties[dataset_hash][public_key_0][public_key_1][mse_cap];
-      remove([public_key_0, public_key_1, mse_cap]);
+      remove([public_key_0, public_key_1, mse_cap], dataset_hash);
       bounties[dataset_hash][public_key_0][public_key_1][mse_cap] = 0;
       to.transfer(topay);
   }

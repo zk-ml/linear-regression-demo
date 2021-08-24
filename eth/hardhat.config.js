@@ -8,7 +8,7 @@ require("@nomiclabs/hardhat-web3");
 require("maci-domainobjs");
 require("maci-crypto");
 
-const CONTRACT_ADDRESS = "0x0165878A594ca255338adfa4d48449f69242Eb8F";
+const CONTRACT_ADDRESS = "0x610178dA211FEF7D417bC0e6FeD39F05609AD788";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -348,6 +348,14 @@ task("add_bounty", "Deposit bounty")
       console.log(receipt);
       console.log(receipt.logs[0].data);
     });
+
+    var mse = await contract.methods.mse_caps().call();
+    var pubkey_1 = await contract.methods.pbkeys_1().call();
+    var pubkey_2 = await contract.methods.pbkeys_2().call();
+
+    console.log(mse);
+    console.log(pubkey_1);
+    console.log(pubkey_2);
 
     console.log("Success!");
   });

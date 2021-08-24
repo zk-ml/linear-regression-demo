@@ -17,9 +17,9 @@ contract BountyManager is Verifier {
 
   mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => uint256)))) public bounties;
 
-  uint[] mse_caps;
-  uint[] pbkeys_1;
-  uint[] pbkeys_2;
+  uint[] public mse_caps;
+  uint[] public pbkeys_1;
+  uint[] public pbkeys_2;
 
   mapping(uint256 => KeysPerf[]) public public_keys;
   mapping(uint256 => uint256) length;
@@ -41,7 +41,7 @@ contract BountyManager is Verifier {
       require(index > 0);
 
       // move the last item into the index being vacated
-      KeysPerf storage lastValue = public_keys[dataset_hash][public_keys[dataset_hash].length - 1];
+      KeysPerf storage lastValue = public_keys[dataset_hash][length[dataset_hash] - 1];
       public_keys[dataset_hash][index - 1] = lastValue;  // adjust for 1-based indexing
       indexOf[lastValue.k1][lastValue.k2][lastValue.mse] = index;
 
@@ -55,6 +55,9 @@ contract BountyManager is Verifier {
   }
 
   function query(uint256 dataset_hash) public {
+    delete mse_caps;
+    delete pbkeys_1;
+    delete pbkeys_2;
     for (uint i = 0; i < public_keys[dataset_hash].length; i++) {
       uint mse = public_keys[dataset_hash][i].mse;
       uint k1 = public_keys[dataset_hash][i].k1;

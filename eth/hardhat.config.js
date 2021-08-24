@@ -36,6 +36,31 @@ task("claim_bounty", "Claim bounty")
       stdio: "inherit",
     });
 
+    const final_zkey = fs.readFileSync("../circuits/artifacts/lr.zkey");
+    const wasm = fs.readFileSync("../circuits/artifacts/lr.wasm");
+    const wtns = { type: "mem" };
+    const input = JSON.parse(fs.readFileSync("./artifacts/quantization/inputs.json"));
+
+    const logger = {
+        debug: () => { },
+        info: console.log,
+        warn: console.log,
+        error: console.log,
+    };
+
+    const cwd = process.cwd();
+
+    const verification_key = await snarkjs.zKey.exportVerificationKey(final_zkey);
+    await snarkjs.wtns.calculate(input, wasm, wtns, logger);
+    const start = Date.now();
+    const { proof, publicSignals } = await snarkjs.groth16.prove(final_zkey, wtns, logger);
+    console.log("Proof took " + (Date.now() - start) / 1000 + " s");
+
+    const verified = await snarkjs.groth16.verify(verification_key, publicSignals, proof, logger);
+    if (!verified) throw new Error("Could not verify the proof");
+
+    const call_data = await snarkjs.groth16.exportSolidityCallData(proof, publicSignals);
+
     console.log("Success!");
   });
 

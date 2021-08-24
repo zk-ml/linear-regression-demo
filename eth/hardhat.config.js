@@ -5,6 +5,8 @@ require("@nomiclabs/hardhat-waffle");
 require("hardhat-gas-reporter");
 require("solidity-coverage");
 require("@nomiclabs/hardhat-web3");
+require("maci-domainobjs");
+require("maci-crypto");
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -26,6 +28,7 @@ task("balance", "Prints an account's balance")
   });
 
 task("claim_bounty", "Claim bounty")
+  .addParam("publicKey", "bounty issuer's publilckey", '["12394963504092133463590298742771255746910402294421902681602275178368694525156", "2810009863761268199375234926728016029541833696552145042968279544829897552560"]')
   .setAction(async (taskArgs) => {
 
     const { execSync } = require("child_process");
@@ -38,10 +41,24 @@ task("claim_bounty", "Claim bounty")
 
     const { Keypair } = require('maci-domainobjs');
     const mimc7 = require('./node_modules/circomlib/src/mimc7.js');
-    //console.log(mimc7)
+    console.log(Keypair);
 
     const key1 = new Keypair();
+    const pubKey = JSON.parse(taskArgs.publicKey);
+    pubKey[0] = BigInt(pubKey[0]);
+    pubKey[1] = BigInt(pubKey[1]);
+
+    
+    /*
+    [
+      BigInt("12394963504092133463590298742771255746910402294421902681602275178368694525156"),
+      BigInt("2810009863761268199375234926728016029541833696552145042968279544829897552560"),
+    ];
+    */
+
     const key2 = new Keypair();
+    key2.pubKey.rawPubKey = pubKey;
+
     const sharedKey = Keypair.genEcdhSharedKey(key1.privKey, key2.pubKey);
 
     const rawdata = fs.readFileSync('./artifacts/quantization/inputs_ml.json');
@@ -178,6 +195,10 @@ task("claim_bounty", "Claim bounty")
 
     const call_data = await snarkjs.groth16.exportSolidityCallData(proof, publicSignals);
 
+    console.log("Your Public Key: ");
+    console.log(key1.pubKey.rawPubKey);
+    console.log("Your Private Key: ");
+    console.log(key1.privKey.rawPrivKey);
     console.log("Success!");
   });
 
@@ -186,7 +207,6 @@ task("deposit_bounty", "Deposit bounty")
 
     const { execSync } = require("child_process");
     const fs = require("fs");
-    const snarkjs = require("snarkjs");
 
     execSync("python3 scripts/quantize_dataset.py", {
       stdio: "inherit",
@@ -268,9 +288,9 @@ task("deposit_bounty", "Deposit bounty")
 
     console.log("Hashed inputs: ");
     console.log(hash_input);
-    console.log("Public Key: ");
+    console.log("Your Public Key: ");
     console.log(key.pubKey.rawPubKey);
-    console.log("Private Key: ");
+    console.log("Your Private Key: ");
     console.log(key.privKey.rawPrivKey);
 
     console.log("Success!");

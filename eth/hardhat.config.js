@@ -9,7 +9,7 @@ require("@nomiclabs/hardhat-web3");
 require("maci-domainobjs");
 require("maci-crypto");
 
-const CONTRACT_ADDRESS = "0x95401dc811bb5740090279Ba06cfA8fcF6113778";
+const CONTRACT_ADDRESS = "0xB0D4afd8879eD9F52b28595d31B441D079B2Ca07";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -339,12 +339,15 @@ task("add_bounty", "Deposit bounty")
     tx = await write_contract.addBounty(hash_input, key.pubKey.rawPubKey, data.out);
     console.log(tx);
 
+    /*
     tx = await write_contract.query(hash_input);
     console.log(tx);
-
-    var mse = await contract.mse_caps("1");
-    var pubkey_1 = await contract.pbkeys_1("1");
-    var pubkey_2 = await contract.pbkeys_2("1");
+    */
+    /*
+    var mse = await write_contract.mse_caps("1");
+    var pubkey_1 = await write_contract.pbkeys_1("1");
+    var pubkey_2 = await write_contract.pbkeys_2("1");
+    */
     /*
     await contract.events.AvailableBounties(function(error, event){ console.log(event); })
     .on("connected", function(subscriptionId){
@@ -366,12 +369,12 @@ task("add_bounty", "Deposit bounty")
     var mse = await contract.methods.mse_caps("1").call();
     var pubkey_1 = await contract.methods.pbkeys_1("1").call();
     var pubkey_2 = await contract.methods.pbkeys_2("1").call();
-    */
 
     console.log(mse);
     console.log(pubkey_1);
     console.log(pubkey_2);
-
+    */
+   
     console.log("Success!");
   });
 // You need to export an object to set up your config

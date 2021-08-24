@@ -62,9 +62,6 @@ contract BountyManager is Verifier {
   }
 
   function query(uint256 dataset_hash) public {
-    delete mse_caps;
-    delete pbkeys_1;
-    delete pbkeys_2;
     for (uint i = 0; i < public_keys[dataset_hash].length; i++) {
       uint mse = public_keys[dataset_hash][i].mse;
       uint k1 = public_keys[dataset_hash][i].k1;
@@ -77,9 +74,8 @@ contract BountyManager is Verifier {
   }
 
   function addBounty(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) public payable {
-    bounties[dataset_hash][public_key[0]][public_key[1]][mse_cap] += msg.value;
-    
-    add(dataset_hash, [public_key[0], public_key[1], mse_cap]);
+    //bounties[dataset_hash][public_key[0]][public_key[1]][mse_cap] += msg.value;
+    //add(dataset_hash, [public_key[0], public_key[1], mse_cap]);
   }
 
   function collectBounty(
@@ -90,15 +86,16 @@ contract BountyManager is Verifier {
           uint[54] memory input
       ) public {
       require(verifyProof(a, b, c, input), "Invalid Proof");
-      uint index_offset = m * p + n * p * 2 + n * 2;
-      uint256 public_key_0 = input[index_offset + 1];
-      uint256 public_key_1 = input[index_offset + 2];
-      uint256 dataset_hash = input[1];
-      uint256 mse_cap = input[0];
-      uint256 topay = bounties[dataset_hash][public_key_0][public_key_1][mse_cap];
-      remove(dataset_hash, [public_key_0, public_key_1, mse_cap]);
-      bounties[dataset_hash][public_key_0][public_key_1][mse_cap] = 0;
-      to.transfer(topay);
+      
+      //uint index_offset = m * p + n * p * 2 + n * 2;
+      //uint256 public_key_0 = input[index_offset + 1];
+      //uint256 public_key_1 = input[index_offset + 2];
+      //uint256 dataset_hash = input[1];
+      //uint256 mse_cap = input[0];
+      //uint256 topay = bounties[dataset_hash][public_key_0][public_key_1][mse_cap];
+      //remove(dataset_hash, [public_key_0, public_key_1, mse_cap]);
+      //bounties[dataset_hash][public_key_0][public_key_1][mse_cap] = 0;
+      //to.transfer(topay);
   }
 
   // Function to receive Ether. msg.data must be empty

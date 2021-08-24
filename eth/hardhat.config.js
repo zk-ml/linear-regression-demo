@@ -30,6 +30,7 @@ task("balance", "Prints an account's balance")
   });
 
 task("claim_bounty", "Claim bounty")
+  .addParam("paymentAddr", "payment address", "0x2546BcD3c84621e976D8185a91A922aE77ECEc30")
   .addParam("publicKey", "bounty issuer's publilckey", '["12394963504092133463590298742771255746910402294421902681602275178368694525156", "2810009863761268199375234926728016029541833696552145042968279544829897552560"]')
   .setAction(async (taskArgs) => {
 
@@ -193,7 +194,11 @@ task("claim_bounty", "Claim bounty")
     const verified = await snarkjs.groth16.verify(verification_key, publicSignals, proof, logger);
     if (!verified) throw new Error("Could not verify the proof");
 
-    const call_data = await snarkjs.groth16.exportSolidityCallData(proof, publicSignals);
+    arg0 = [proof.pi_a[0], proof.pi_a[1]]
+    arg1 = [[proof.pi_b[0][1], proof.pi_b[0][0]], [proof.pi_b[1][1], proof.pi_b[1][0]]]
+    arg2 = [proof.pi_c[0], proof.pi_c[1]]
+    arg3 = publicSignals;
+
 
     const contract_interface = JSON.parse(fs.readFileSync("artifacts/contracts/libraries/BountyManager.sol/BountyManager.json")).abi;
     var contract = new web3.eth.Contract(contract_interface, CONTRACT_ADDRESS, {
@@ -201,8 +206,9 @@ task("claim_bounty", "Claim bounty")
       gasPrice: '20000000000' // default gas price in wei, 20 gwei in this case
     });
 
-    //console.log(JSON.parse(call_data));
-    contract.methods.collectBounty(call_data).send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30'})
+    console.log([arg0, arg1, arg2, arg3]);
+    console.log("Paying " + taskArgs.paymentAddr);
+    contract.methods.collectBounty(taskArgs.paymentAddr, arg0, arg1, arg2, arg3).send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30'})
   
     console.log("Your Public Key: ");
     console.log(key1.pubKey.rawPubKey);

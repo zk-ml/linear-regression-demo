@@ -17,7 +17,9 @@ contract BountyManager is Verifier {
 
   mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => uint256)))) public bounties;
 
-  KeysPerf[] public queryResult;
+  uint[] mse_caps;
+  uint[] pbkeys_1;
+  uint[] pbkeys_2;
 
   mapping(uint256 => KeysPerf[]) public public_keys;
   mapping(uint256 => uint256) length;
@@ -47,22 +49,21 @@ contract BountyManager is Verifier {
       indexOf[value[0]][value[1]][value[2]] = 0;
   }
 
-  event AvailableBounties(uint[] mse_caps, uint[][2] public_keys);
+  event AvailableBounties(uint[] mse_caps, uint[] public_keys_1, uint[] public_keys_2);
 
   constructor() public payable {
   }
 
   function query(uint256 dataset_hash) public {
-    queryResult = public_keys[dataset_hash];
-    uint[] mse_caps;
-    uint[][2] public_keys;
-
-    for (uint i = 0; i < queryResult.length; i++) {
-      mse_caps.push(queryResult[i].mse);
-      public_keys.push([queryResult[i].k1, queryResult[i].k2]);
+    for (uint i = 0; i < public_keys[dataset_hash].length; i++) {
+      uint mse = public_keys[dataset_hash][i].mse;
+      uint k1 = public_keys[dataset_hash][i].k1;
+      uint k2 = public_keys[dataset_hash][i].k2;
+      mse_caps.push(mse);
+      pbkeys_1.push(k1);
+      pbkeys_2.push(k2);
     }
-    emit AvailableBounties(mse_caps, public_keys);
-    queryResult = public_keys[dataset_hash];
+    emit AvailableBounties(mse_caps, pbkeys_1, pbkeys_2);
   }
 
   function addBounty(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) public payable {

@@ -346,6 +346,7 @@ task("add_bounty", "Deposit bounty")
       console.log(transactionHash);
       const receipt = await web3.eth.getTransactionReceipt(transactionHash);
       console.log(receipt);
+      console.log(receipt.logs[0].data);
     });
 
     console.log("Success!");

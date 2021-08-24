@@ -8,7 +8,7 @@ require("@nomiclabs/hardhat-web3");
 require("maci-domainobjs");
 require("maci-crypto");
 
-const CONTRACT_ADDRESS = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707";
+const CONTRACT_ADDRESS = "0x0165878A594ca255338adfa4d48449f69242Eb8F";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -324,15 +324,25 @@ task("add_bounty", "Deposit bounty")
       gasPrice: '20000000000' // default gas price in wei, 20 gwei in this case
     });
 
-    await contract.methods.addBounty(hash_input, data.publicKey, data.out).send({value: web3.utils.toWei(taskArgs.amount, "ether"), from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
-      console.log(error);
+    /*
+    await contract.events.AvailableBounties(function(error, event){ console.log(event); })
+    .on("connected", function(subscriptionId){
+        console.log("event");
+        console.log(subscriptionId);
+    })
+    .on('data', function(event){
+        console.log("event");
+        console.log(event); // same results as the optional callback above
+    });
+    */
+
+    await contract.methods.addBounty(hash_input, key.pubKey.rawPubKey, data.out).send({value: web3.utils.toWei(taskArgs.amount, "ether"), from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
       console.log(transactionHash);
       const receipt = await web3.eth.getTransactionReceipt(transactionHash);
       console.log(receipt);
     });
 
-    await contract.methods.query(hash_input).send({value: web3.utils.toWei(taskArgs.amount, "ether"), from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
-      console.log(error);
+    await contract.methods.query(hash_input).send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
       console.log(transactionHash);
       const receipt = await web3.eth.getTransactionReceipt(transactionHash);
       console.log(receipt);

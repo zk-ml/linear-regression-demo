@@ -2,6 +2,7 @@ pragma solidity >=0.6.0 <0.9.0;
 //SPDX-License-Identifier: MIT
 
 import "./LibVerifier.sol";
+import "hardhat/console.sol";
 
 contract BountyManager is Verifier {
 
@@ -20,6 +21,10 @@ contract BountyManager is Verifier {
 
   function addBounty(uint256 dataset_hash, uint256 mse_cap) public payable {
     bounties[dataset_hash][mse_cap] += msg.value;
+  }
+
+  function fails() public {
+    require(0 == 1, "fails");
   }
 
   function collectBounty(

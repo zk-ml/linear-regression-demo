@@ -8,7 +8,7 @@ require("@nomiclabs/hardhat-web3");
 require("maci-domainobjs");
 require("maci-crypto");
 
-const CONTRACT_ADDRESS = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
+const CONTRACT_ADDRESS = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -206,11 +206,17 @@ task("claim_bounty", "Claim bounty")
       gasPrice: '20000000000' // default gas price in wei, 20 gwei in this case
     });
 
-    console.log([arg0, arg1, arg2, arg3]);
+    console.log([arg0, arg1, arg2]);
     console.log("Paying " + taskArgs.paymentAddr);
-    await contract.methods.collectBounty(taskArgs.paymentAddr, arg0, arg1, arg2, arg3).send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30'}, function(error, transactionHash){
-      console.log(error);
-      console.log(transactionHash);
+    
+    //arg3[0] = "133";
+
+    //console.log(arg3);
+    await contract.methods.collectBounty(taskArgs.paymentAddr, arg0, arg1, arg2, arg3).send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
+      console.log("error " + error);
+      console.log("hash " + transactionHash);
+      const receipt = await web3.eth.getTransactionReceipt(transactionHash);
+      console.log(receipt);
     });
   
     console.log("Your Public Key: ");
@@ -317,9 +323,20 @@ task("add_bounty", "Deposit bounty")
       gasPrice: '20000000000' // default gas price in wei, 20 gwei in this case
     });
 
-    await contract.methods.addBounty(hash_input, data.out).send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30'}, function(error, transactionHash){
+    /*
+    await contract.methods.fails().send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
       console.log(error);
       console.log(transactionHash);
+      const receipt = await web3.eth.getTransactionReceipt(transactionHash);
+      console.log(receipt);
+    });
+    */
+
+    await contract.methods.addBounty(hash_input, data.out).send({value: web3.utils.toWei("1", "ether"), from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
+      console.log(error);
+      console.log(transactionHash);
+      const receipt = await web3.eth.getTransactionReceipt(transactionHash);
+      console.log(receipt);
     });
 
     console.log("Success!");

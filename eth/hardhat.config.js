@@ -9,7 +9,7 @@ require("@nomiclabs/hardhat-web3");
 require("maci-domainobjs");
 require("maci-crypto");
 
-const CONTRACT_ADDRESS = "0xB0D4afd8879eD9F52b28595d31B441D079B2Ca07";
+const CONTRACT_ADDRESS = "0x51A1ceB83B83F1985a81C295d1fF28Afef186E02";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -28,6 +28,21 @@ task("balance", "Prints an account's balance")
     const balance = await web3.eth.getBalance(account);
 
     console.log(web3.utils.fromWei(balance, "ether"), "ETH");
+  });
+
+task("list_bounties", "List bounties")
+  .addParam("datasetHash", "Dataset hash", "15681440893605958136105542719628389980032562080249509287477198087707031153419")
+  .setAction(async (taskArgs) => {
+    const provider = new ethers.providers.JsonRpcProvider();
+    const contract_interface = JSON.parse(fs.readFileSync("artifacts/contracts/libraries/BountyManager.sol/BountyManager.json")).abi;
+    var contract = new hre.ethers.Contract(CONTRACT_ADDRESS, contract_interface, provider);
+
+    wallet = await hre.ethers.getSigner();
+
+    const write_contract = contract.connect(wallet);
+
+    tx = await write_contract.query_bounties(taskArgs.datasetHash);
+    console.log(tx);  
   });
 
 task("claim_bounty", "Claim bounty")
@@ -339,10 +354,10 @@ task("add_bounty", "Deposit bounty")
     tx = await write_contract.addBounty(hash_input, key.pubKey.rawPubKey, data.out);
     console.log(tx);
 
-    /*
-    tx = await write_contract.query(hash_input);
-    console.log(tx);
-    */
+    console.log(hash_input);
+    tx = await write_contract.query_bounties(hash_input);
+    console.log(tx[0].length);
+    
     /*
     var mse = await write_contract.mse_caps("1");
     var pubkey_1 = await write_contract.pbkeys_1("1");
@@ -374,7 +389,7 @@ task("add_bounty", "Deposit bounty")
     console.log(pubkey_1);
     console.log(pubkey_2);
     */
-   
+
     console.log("Success!");
   });
 // You need to export an object to set up your config

@@ -9,7 +9,7 @@ require("@nomiclabs/hardhat-web3");
 require("maci-domainobjs");
 require("maci-crypto");
 
-const CONTRACT_ADDRESS = "0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB";
+const CONTRACT_ADDRESS = "0x95401dc811bb5740090279Ba06cfA8fcF6113778";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html

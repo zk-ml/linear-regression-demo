@@ -21,6 +21,10 @@ contract BountyManager is Verifier {
   uint[] public pbkeys_1;
   uint[] public pbkeys_2;
 
+  uint m;
+  uint p;
+  uint n;
+
   mapping(uint256 => KeysPerf[]) public public_keys;
   mapping(uint256 => uint256) length;
 
@@ -51,7 +55,10 @@ contract BountyManager is Verifier {
 
   event AvailableBounties(uint[] mse_caps, uint[] public_keys_1, uint[] public_keys_2);
 
-  constructor() public payable {
+  constructor(uint im, uint ip, uint ni) public payable {
+    m = im;
+    p = ip;
+    n = ni;
   }
 
   function query(uint256 dataset_hash) public {
@@ -83,8 +90,9 @@ contract BountyManager is Verifier {
           uint[54] memory input
       ) public {
       require(verifyProof(a, b, c, input), "Invalid Proof");
-      uint256 public_key_0 = input[2];
-      uint256 public_key_1 = input[3];
+      uint index_offset = m * p + n * p * 2 + n * 2;
+      uint256 public_key_0 = input[index_offset + 1];
+      uint256 public_key_1 = input[index_offset + 2];
       uint256 dataset_hash = input[1];
       uint256 mse_cap = input[0];
       uint256 topay = bounties[dataset_hash][public_key_0][public_key_1][mse_cap];

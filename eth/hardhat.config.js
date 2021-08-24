@@ -32,15 +32,19 @@ task("claim_bounty", "Claim bounty")
     const fs = require("fs");
     const snarkjs = require("snarkjs");
 
+    execSync("python3 scripts/gemm.py", {
+      stdio: "inherit",
+    });
+
     const { Keypair } = require('maci-domainobjs');
-    const mimc7 = require('../circomlib/src/mimc7.js');
+    const mimc7 = require('./node_modules/circomlib/src/mimc7.js');
     //console.log(mimc7)
 
     const key1 = new Keypair();
     const key2 = new Keypair();
     const sharedKey = Keypair.genEcdhSharedKey(key1.privKey, key2.pubKey);
 
-    const rawdata = fs.readFileSync('../inputs.json');
+    const rawdata = fs.readFileSync('./artifacts/quantization/inputs_ml.json');
     const data = JSON.parse(rawdata);
     console.log(data);
 
@@ -132,19 +136,6 @@ task("claim_bounty", "Claim bounty")
     console.log(b_q_enc);
     //console.log(W_q_enc);
 
-    const input_test = {
-      shared_key: sharedKey.toString(),
-      private_key: key1.privKey.asCircuitInputs(),
-      public_key: key2.pubKey.asCircuitInputs(),
-      message: 1234,
-    };
-
-    fs.writeFile(
-      '../encrypt/test_input.json',
-      JSON.stringify(input_test),
-      () => {},
-    );
-
     const _input = {
       hash_input: hash_input,
       private_key: key1.privKey.asCircuitInputs(),
@@ -158,7 +149,7 @@ task("claim_bounty", "Claim bounty")
     BigInt.prototype.toJSON = function() { return this.toString()  }
 
     fs.writeFile(
-      '../input.json',
+      './artifacts/quantization/inputs.json',
       JSON.stringify(input, null, 2),
       () => {},
     );
@@ -166,7 +157,6 @@ task("claim_bounty", "Claim bounty")
     const final_zkey = fs.readFileSync("../circuits/artifacts/lr.zkey");
     const wasm = fs.readFileSync("../circuits/artifacts/lr.wasm");
     const wtns = { type: "mem" };
-    const input = JSON.parse(fs.readFileSync("./artifacts/quantization/inputs.json"));
 
     const logger = {
         debug: () => { },

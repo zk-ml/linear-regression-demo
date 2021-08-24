@@ -9,7 +9,7 @@ require("@nomiclabs/hardhat-web3");
 require("maci-domainobjs");
 require("maci-crypto");
 
-const CONTRACT_ADDRESS = "0x1c85638e118b37167e9298c2268758e058DdfDA0";
+const CONTRACT_ADDRESS = "0xF8e31cb472bc70500f08Cd84917E5A1912Ec8397";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -47,7 +47,7 @@ task("list_bounties", "List bounties")
     console.log("Available bounties on dataset: " + alias);
     tx = await write_contract.query_bounties(taskArgs.datasetHash);
     const bounties = tx.map(function (x) { 
-      return {"PublicKey-1": x[0].toString(), "PublicKey-2": x[1].toString(), "MSE-Cap":  x[2].toString()}; 
+      return {"PublicKey-1": x[0].toString(16), "PublicKey-2": x[1].toString(16), "MSE-Cap":  x[2].toString(16)}; 
     });
     console.log(bounties);  
   });
@@ -65,20 +65,21 @@ task("list_bounties", "List bounties")
 
     tx = await write_contract.query_datasets();
     
-    const hashes = tx.map(function (x) { return x.toString() });
+    const hashes = tx.map(function (x) { return x.toString(16) });
     const aliases = await Promise.all(tx.map(async function (hash) {
       var alias = await write_contract.get_alias(hash);
       return alias;
     }));
     
+    const zip = (a, b) => a.map((k, i) => [k, b[i]]);
+
     console.log("Available datasets:");
-    console.log(hashes);  
-    console.log(aliases);
+    console.log(zip(aliases, hashes));
   });
 
 task("claim_bounty", "Claim bounty")
   .addParam("paymentAddr", "payment address", "0x2546BcD3c84621e976D8185a91A922aE77ECEc30")
-  .addParam("publicKey", "bounty issuer's publilckey", '["12394963504092133463590298742771255746910402294421902681602275178368694525156", "2810009863761268199375234926728016029541833696552145042968279544829897552560"]')
+  .addParam("publicKey", "bounty issuer's publilckey", '["6200424876343153377444222516721613071832202193284154667149636560744325857446", "3438276812619573162363877036847828938139883778055244932189209926469640592519"]')
   .setAction(async (taskArgs) => {
 
     const { execSync } = require("child_process");
@@ -213,7 +214,7 @@ task("claim_bounty", "Claim bounty")
 
     const input = Object.assign({}, data, _input);
 
-    BigInt.prototype.toJSON = function() { return this.toString()  }
+    BigInt.prototype.toJSON = function() { return this.toString(16)  }
 
     fs.writeFile(
       './artifacts/quantization/inputs.json',
@@ -241,10 +242,12 @@ task("claim_bounty", "Claim bounty")
     const verified = await snarkjs.groth16.verify(verification_key, publicSignals, proof, logger);
     if (!verified) throw new Error("Could not verify the proof");
 
-    arg0 = [proof.pi_a[0], proof.pi_a[1]]
-    arg1 = [[proof.pi_b[0][1], proof.pi_b[0][0]], [proof.pi_b[1][1], proof.pi_b[1][0]]]
-    arg2 = [proof.pi_c[0], proof.pi_c[1]]
-    arg3 = publicSignals;
+    function convert(x) {return '0x'+BigInt(x).toString(16);}
+
+    arg0 = [proof.pi_a[0], proof.pi_a[1]].map(convert);
+    arg1 = [[proof.pi_b[0][1], proof.pi_b[0][0]].map(convert), [proof.pi_b[1][1], proof.pi_b[1][0]].map(convert)]
+    arg2 = [proof.pi_c[0], proof.pi_c[1]].map(convert);
+    arg3 = publicSignals.map(convert);
 
 
     const provider = new ethers.providers.JsonRpcProvider();
@@ -263,9 +266,13 @@ task("claim_bounty", "Claim bounty")
     //console.log(arg3);
     //await write_contract.collectBounty(taskArgs.paymentAddr, arg0, arg1, arg2, arg3).send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6},);
   
+    console.log(arg0, arg1, arg2, arg3);
+
     tx = await write_contract.collectBounty(taskArgs.paymentAddr, arg0, arg1, arg2, arg3);
 
-    console.log(tx);
+    await provider.sendTransaction(tx).then(console.log);
+
+    //console.log(tx);
 
     console.log("Your Public Key: ");
     console.log(key1.pubKey.rawPubKey);
@@ -366,14 +373,6 @@ task("add_bounty", "Deposit bounty")
     console.log("Your Private Key: ");
     console.log(key.privKey.rawPrivKey);
 
-    /*
-    const contract_interface = JSON.parse(fs.readFileSync("artifacts/contracts/libraries/BountyManager.sol/BountyManager.json")).abi;
-    var contract = new web3.eth.Contract(contract_interface, CONTRACT_ADDRESS, {
-      from: '0x1234567890123456789012345678901234567891', // default from address
-      gasPrice: '20000000000' // default gas price in wei, 20 gwei in this case
-    });
-    */
-
     const provider = new ethers.providers.JsonRpcProvider();
     const contract_interface = JSON.parse(fs.readFileSync("artifacts/contracts/libraries/BountyManager.sol/BountyManager.json")).abi;
     var contract = new hre.ethers.Contract(CONTRACT_ADDRESS, contract_interface, provider);
@@ -383,43 +382,10 @@ task("add_bounty", "Deposit bounty")
     const write_contract = contract.connect(wallet);
 
     tx = await write_contract.addBounty(hash_input, "dataset", key.pubKey.rawPubKey, data.out);
-    console.log(tx);
+    
+    await provider.sendTransaction(tx).then(console.log);
 
     console.log(hash_input);
-    tx = await write_contract.query_bounties(hash_input);
-    
-    /*
-    var mse = await write_contract.mse_caps("1");
-    var pubkey_1 = await write_contract.pbkeys_1("1");
-    var pubkey_2 = await write_contract.pbkeys_2("1");
-    */
-    /*
-    await contract.events.AvailableBounties(function(error, event){ console.log(event); })
-    .on("connected", function(subscriptionId){
-        console.log("event");
-        console.log(subscriptionId);
-    })
-    .on('data', function(event){
-        console.log("event");
-        console.log(event); // same results as the optional callback above
-    });
-
-    await contract.methods.query(hash_input).send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
-      console.log(transactionHash);
-      const receipt = await web3.eth.getTransactionReceipt(transactionHash);
-      console.log(receipt);
-      console.log(receipt.logs[0].data);
-    });
-
-    var mse = await contract.methods.mse_caps("1").call();
-    var pubkey_1 = await contract.methods.pbkeys_1("1").call();
-    var pubkey_2 = await contract.methods.pbkeys_2("1").call();
-
-    console.log(mse);
-    console.log(pubkey_1);
-    console.log(pubkey_2);
-    */
-
     console.log("Success!");
   });
 // You need to export an object to set up your config

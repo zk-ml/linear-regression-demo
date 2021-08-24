@@ -41,7 +41,9 @@ contract BountyManager is Verifier {
   function remove(uint256 value) public {
       uint256 index = indexOf[value];
 
-      require(index > 0);
+      if (index == 0) {
+        return;
+      }
 
       // move the last item into the index being vacated
       uint256 lastValue = list_bounties[length_list_bounties - 1];
@@ -66,7 +68,9 @@ contract BountyManager is Verifier {
   function remove_bounty(uint256 dataset_hash, uint256[3] memory value) public {
       uint256 index = bountyIndexOf[value[0]][value[1]][value[2]];
 
-      require(index > 0);
+      if (index == 0) {
+        return;
+      }
 
       // move the last item into the index being vacated
       KeysPerf storage lastValue = public_keys[dataset_hash][length[dataset_hash] - 1];
@@ -119,7 +123,7 @@ contract BountyManager is Verifier {
           uint[2][2] memory b,
           uint[2] memory c,
           uint[54] memory input
-      ) public {
+      ) public returns (uint256) {
       require(verifyProof(a, b, c, input), "Invalid Proof");
       
       uint index_offset = m * p + n * p * 2 + n * 2;
@@ -134,6 +138,7 @@ contract BountyManager is Verifier {
       }
       bounties[dataset_hash][public_key_0][public_key_1][mse_cap] = 0;
       to.transfer(topay);
+      return topay;
   }
 
   // Function to receive Ether. msg.data must be empty

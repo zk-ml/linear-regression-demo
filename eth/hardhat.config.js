@@ -349,9 +349,9 @@ task("add_bounty", "Deposit bounty")
       console.log(receipt.logs[0].data);
     });
 
-    var mse = await contract.methods.mse_caps().call();
-    var pubkey_1 = await contract.methods.pbkeys_1().call();
-    var pubkey_2 = await contract.methods.pbkeys_2().call();
+    var mse = await contract.methods.mse_caps("1").call();
+    var pubkey_1 = await contract.methods.pbkeys_1("1").call();
+    var pubkey_2 = await contract.methods.pbkeys_2("1").call();
 
     console.log(mse);
     console.log(pubkey_1);

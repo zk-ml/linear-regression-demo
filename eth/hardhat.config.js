@@ -25,6 +25,33 @@ task("balance", "Prints an account's balance")
     console.log(web3.utils.fromWei(balance, "ether"), "ETH");
   });
 
+task("claim_bounty", "Claim bounty")
+  .setAction(async (taskArgs) => {
+
+    const { execSync } = require("child_process");
+    const fs = require("fs");
+    const snarkjs = require("snarkjs");
+
+    execSync("python3 scripts/gemm.py", {
+      stdio: "inherit",
+    });
+
+    console.log("Success!");
+  });
+
+task("deposit_bounty", "Deposit bounty")
+  .setAction(async (taskArgs) => {
+
+    const { execSync } = require("child_process");
+    const fs = require("fs");
+    const snarkjs = require("snarkjs");
+
+    execSync("python3 scripts/gemm.py", {
+      stdio: "inherit",
+    });
+
+    console.log("Success!");
+  });
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 

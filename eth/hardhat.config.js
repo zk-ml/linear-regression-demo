@@ -331,6 +331,13 @@ task("add_bounty", "Deposit bounty")
       console.log(receipt);
     });
 
+    await contract.methods.query(hash_input).send({value: web3.utils.toWei(taskArgs.amount, "ether"), from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
+      console.log(error);
+      console.log(transactionHash);
+      const receipt = await web3.eth.getTransactionReceipt(transactionHash);
+      console.log(receipt);
+    });
+
     console.log("Success!");
   });
 // You need to export an object to set up your config

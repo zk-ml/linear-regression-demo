@@ -21,6 +21,9 @@
     "prettier": "^2.3.2",
     "prettier-plugin-solidity": "^1.0.0-beta.13",
     "solhint": "^3.3.6",
-    "solidity-coverage": "^0.7.16"
+    "solidity-coverage": "^0.7.16",
+    "maci-crypto": "^0.9.1",
+    "maci-domainobjs": "^0.9.1",
+    "circomlib": "0.5.3"
   }
 }

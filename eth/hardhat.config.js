@@ -32,9 +32,136 @@ task("claim_bounty", "Claim bounty")
     const fs = require("fs");
     const snarkjs = require("snarkjs");
 
-    execSync("python3 scripts/gemm.py", {
-      stdio: "inherit",
+    const { Keypair } = require('maci-domainobjs');
+    const mimc7 = require('../circomlib/src/mimc7.js');
+    //console.log(mimc7)
+
+    const key1 = new Keypair();
+    const key2 = new Keypair();
+    const sharedKey = Keypair.genEcdhSharedKey(key1.privKey, key2.pubKey);
+
+    const rawdata = fs.readFileSync('../inputs.json');
+    const data = JSON.parse(rawdata);
+    console.log(data);
+
+    function tobigint(value) {
+      return BigInt(value);
+    }
+
+    var to_hash = [];
+    var m = 1;
+    var p = 10;
+    var n = 1;
+
+    var idx = 0;
+    for (var i = 0; i < m; i++) {
+        for (var j = 0; j < p; j++) {
+            to_hash.push(data.X_q[i][j]);
+            idx = idx + 1;
+            
+        }
+    }
+
+    for (var i = 0; i < m; i++) {
+        for (var j = 0; j < n; j++) {
+            to_hash.push(data.Yt_q[i][j]);
+            idx = idx + 1;
+        }
+    }
+
+    to_hash.push(data.z_X);
+    idx = idx + 1; 
+    to_hash.push(data.z_W);
+    idx = idx + 1;
+    to_hash.push(data.z_b);
+    idx = idx + 1;
+    to_hash.push(data.z_Y);
+    idx = idx + 1;
+    to_hash.push(data.sbsY_numerator);
+    idx = idx + 1;
+    to_hash.push(data.sbsY_denominator);
+    idx = idx + 1;
+    to_hash.push(data.sXsWsY_numerator);
+    idx = idx + 1;
+    to_hash.push(data.sXsWsY_denominator);
+    idx = idx + 1;
+
+    to_hash.push(data.sYsR_numerator);
+    idx = idx + 1;
+    to_hash.push(data.sYsR_denominator);
+    idx = idx + 1;
+    to_hash.push(data.sYtsR_numerator);
+    idx = idx + 1;
+    to_hash.push(data.sYtsR_denominator);
+    idx = idx + 1;
+    to_hash.push(data.constant);
+    idx = idx + 1;
+
+    to_hash.push(data.z_R);
+    idx = idx + 1;
+    to_hash.push(data.z_Sq);
+    idx = idx + 1;
+    to_hash.push(data.sR2sSq_numerator);
+    idx = idx + 1;
+    to_hash.push(data.sR2sSq_denominator);
+    idx = idx + 1;
+
+    const hash_input = mimc7.multiHash(to_hash.map(tobigint), BigInt(0));
+
+    const W_q_enc = data.W_q.map(function(arr) {
+      return arr.slice().map(tobigint);
     });
+
+    const b_q_enc = data.b_q.slice().map(tobigint);
+
+    for (let i = 0; i < b_q_enc.length; i++) {
+      var val1 = mimc7.multiHash([b_q_enc[i]], BigInt(0));
+      var val2 = mimc7.hash(sharedKey, val1);
+      b_q_enc[i] = [val1, b_q_enc[i]+val2];
+    }
+
+    //console.log(W_q_enc);
+
+    for (let i = 0; i < W_q_enc.length; i++) {
+      for (let j = 0; j < W_q_enc[0].length; j++) {
+        var val1 = mimc7.multiHash([W_q_enc[i][j]], BigInt(0));
+        var val2 = mimc7.hash(sharedKey, val1);
+        W_q_enc[i][j] = [val1, W_q_enc[i][j]+val2];
+      }
+    }
+    console.log(b_q_enc);
+    //console.log(W_q_enc);
+
+    const input_test = {
+      shared_key: sharedKey.toString(),
+      private_key: key1.privKey.asCircuitInputs(),
+      public_key: key2.pubKey.asCircuitInputs(),
+      message: 1234,
+    };
+
+    fs.writeFile(
+      '../encrypt/test_input.json',
+      JSON.stringify(input_test),
+      () => {},
+    );
+
+    const _input = {
+      hash_input: hash_input,
+      private_key: key1.privKey.asCircuitInputs(),
+      public_key: key2.pubKey.asCircuitInputs(),
+      W_q_enc : W_q_enc,
+      b_q_enc : b_q_enc,
+    };
+
+    const input = Object.assign({}, data, _input);
+
+    BigInt.prototype.toJSON = function() { return this.toString()  }
+
+    fs.writeFile(
+      '../input.json',
+      JSON.stringify(input, null, 2),
+      () => {},
+    );
 
     const final_zkey = fs.readFileSync("../circuits/artifacts/lr.zkey");
     const wasm = fs.readFileSync("../circuits/artifacts/lr.wasm");

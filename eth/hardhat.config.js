@@ -9,7 +9,7 @@ require("@nomiclabs/hardhat-web3");
 require("maci-domainobjs");
 require("maci-crypto");
 
-const CONTRACT_ADDRESS = "0x51A1ceB83B83F1985a81C295d1fF28Afef186E02";
+const CONTRACT_ADDRESS = "0x4EE6eCAD1c2Dae9f525404De8555724e3c35d07B";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -33,6 +33,7 @@ task("balance", "Prints an account's balance")
 task("list_bounties", "List bounties")
   .addParam("datasetHash", "Dataset hash", "15681440893605958136105542719628389980032562080249509287477198087707031153419")
   .setAction(async (taskArgs) => {
+    const fs = require("fs");
     const provider = new ethers.providers.JsonRpcProvider();
     const contract_interface = JSON.parse(fs.readFileSync("artifacts/contracts/libraries/BountyManager.sol/BountyManager.json")).abi;
     var contract = new hre.ethers.Contract(CONTRACT_ADDRESS, contract_interface, provider);
@@ -356,7 +357,6 @@ task("add_bounty", "Deposit bounty")
 
     console.log(hash_input);
     tx = await write_contract.query_bounties(hash_input);
-    console.log(tx[0].length);
     
     /*
     var mse = await write_contract.mse_caps("1");

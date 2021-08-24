@@ -226,7 +226,8 @@ task("claim_bounty", "Claim bounty")
     console.log("Success!");
   });
 
-task("add_bounty", "Deposit bounty")
+task("add_bounty", "Deposit bounty") 
+  .addParam("amount", "amount to add to bounty", "0.01")
   .setAction(async (taskArgs) => {
 
     const { execSync } = require("child_process");
@@ -323,16 +324,7 @@ task("add_bounty", "Deposit bounty")
       gasPrice: '20000000000' // default gas price in wei, 20 gwei in this case
     });
 
-    /*
-    await contract.methods.fails().send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
-      console.log(error);
-      console.log(transactionHash);
-      const receipt = await web3.eth.getTransactionReceipt(transactionHash);
-      console.log(receipt);
-    });
-    */
-
-    await contract.methods.addBounty(hash_input, data.out).send({value: web3.utils.toWei("1", "ether"), from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
+    await contract.methods.addBounty(hash_input, data.out).send({value: web3.utils.toWei(taskArgs.amount, "ether"), from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
       console.log(error);
       console.log(transactionHash);
       const receipt = await web3.eth.getTransactionReceipt(transactionHash);

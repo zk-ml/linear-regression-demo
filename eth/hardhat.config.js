@@ -32,7 +32,7 @@ task("claim_bounty", "Claim bounty")
     const fs = require("fs");
     const snarkjs = require("snarkjs");
 
-    execSync("python3 scripts/gemm.py", {
+    execSync("python3 scripts/quantize_model.py", {
       stdio: "inherit",
     });
 
@@ -188,9 +188,90 @@ task("deposit_bounty", "Deposit bounty")
     const fs = require("fs");
     const snarkjs = require("snarkjs");
 
-    execSync("python3 scripts/gemm.py", {
+    execSync("python3 scripts/quantize_dataset.py", {
       stdio: "inherit",
     });
+
+    const { Keypair } = require('maci-domainobjs');
+    const mimc7 = require('./node_modules/circomlib/src/mimc7.js');
+    //console.log(mimc7)
+
+    const key = new Keypair();
+
+    const rawdata = fs.readFileSync('./artifacts/quantization/inputs_dataset.json');
+    const data = JSON.parse(rawdata);
+    console.log(data);
+
+    function tobigint(value) {
+      return BigInt(value);
+    }
+
+    var to_hash = [];
+    var m = 1;
+    var p = 10;
+    var n = 1;
+
+    var idx = 0;
+    for (var i = 0; i < m; i++) {
+        for (var j = 0; j < p; j++) {
+            to_hash.push(data.X_q[i][j]);
+            idx = idx + 1;
+            
+        }
+    }
+
+    for (var i = 0; i < m; i++) {
+        for (var j = 0; j < n; j++) {
+            to_hash.push(data.Yt_q[i][j]);
+            idx = idx + 1;
+        }
+    }
+
+    to_hash.push(data.z_X);
+    idx = idx + 1; 
+    to_hash.push(data.z_W);
+    idx = idx + 1;
+    to_hash.push(data.z_b);
+    idx = idx + 1;
+    to_hash.push(data.z_Y);
+    idx = idx + 1;
+    to_hash.push(data.sbsY_numerator);
+    idx = idx + 1;
+    to_hash.push(data.sbsY_denominator);
+    idx = idx + 1;
+    to_hash.push(data.sXsWsY_numerator);
+    idx = idx + 1;
+    to_hash.push(data.sXsWsY_denominator);
+    idx = idx + 1;
+
+    to_hash.push(data.sYsR_numerator);
+    idx = idx + 1;
+    to_hash.push(data.sYsR_denominator);
+    idx = idx + 1;
+    to_hash.push(data.sYtsR_numerator);
+    idx = idx + 1;
+    to_hash.push(data.sYtsR_denominator);
+    idx = idx + 1;
+    to_hash.push(data.constant);
+    idx = idx + 1;
+
+    to_hash.push(data.z_R);
+    idx = idx + 1;
+    to_hash.push(data.z_Sq);
+    idx = idx + 1;
+    to_hash.push(data.sR2sSq_numerator);
+    idx = idx + 1;
+    to_hash.push(data.sR2sSq_denominator);
+    idx = idx + 1;
+
+    const hash_input = mimc7.multiHash(to_hash.map(tobigint), BigInt(0));
+
+    console.log("Hashed inputs: ");
+    console.log(hash_input);
+    console.log("Public Key: ");
+    console.log(key.pubKey.rawPubKey);
+    console.log("Private Key: ");
+    console.log(key.privKey.rawPrivKey);
 
     console.log("Success!");
   });

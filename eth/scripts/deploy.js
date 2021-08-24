@@ -20,9 +20,28 @@ async function main() {
 
   await bm.deployed();
 
-  await web3.eth.sendTransaction({from: "0x71bE63f3384f5fb98995898A86B02Fb2426c5788", to: bm.address, value: web3.utils.toWei("1", "ether")})
-  
+  // If you don't specify a //url//, Ethers connects to the default 
+  // (i.e. ``http:/\/localhost:8545``)
+  const provider = new hre.ethers.providers.JsonRpcProvider();
+
+  tx = {
+    to: bm.address,
+    value: hre.ethers.utils.parseEther("1.0")
+  }
+
+  wallet = await hre.ethers.getSigner();
+
+  // Querying the network
+  console.log(await wallet.getBalance());
+
+  res = await wallet.sendTransaction(tx);
+
+  console.log(res)
+
   console.log("Greeter deployed to:", bm.address);
+
+  console.log(await provider.getBalance(bm.address));
+  console.log(await provider.getTransactionCount(bm.address));
 }
 
 // We recommend this pattern to be able to use async/await everywhere

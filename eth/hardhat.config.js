@@ -2,13 +2,14 @@ require("dotenv").config();
 
 require("@nomiclabs/hardhat-etherscan");
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-ethers");
 require("hardhat-gas-reporter");
 require("solidity-coverage");
 require("@nomiclabs/hardhat-web3");
 require("maci-domainobjs");
 require("maci-crypto");
 
-const CONTRACT_ADDRESS = "0x610178dA211FEF7D417bC0e6FeD39F05609AD788";
+const CONTRACT_ADDRESS = "0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -200,11 +201,13 @@ task("claim_bounty", "Claim bounty")
     arg3 = publicSignals;
 
 
+    const provider = new ethers.providers.JsonRpcProvider();
     const contract_interface = JSON.parse(fs.readFileSync("artifacts/contracts/libraries/BountyManager.sol/BountyManager.json")).abi;
-    var contract = new web3.eth.Contract(contract_interface, CONTRACT_ADDRESS, {
-      from: '0x1234567890123456789012345678901234567891', // default from address
-      gasPrice: '20000000000' // default gas price in wei, 20 gwei in this case
-    });
+    var contract = new hre.ethers.Contract(CONTRACT_ADDRESS, contract_interface, provider);
+
+    wallet = await hre.ethers.getSigner();
+
+    const write_contract = contract.connect(wallet);
 
     console.log([arg0, arg1, arg2]);
     console.log("Paying " + taskArgs.paymentAddr);
@@ -212,13 +215,12 @@ task("claim_bounty", "Claim bounty")
     //arg3[0] = "133";
 
     //console.log(arg3);
-    await contract.methods.collectBounty(taskArgs.paymentAddr, arg0, arg1, arg2, arg3).send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
-      console.log("error " + error);
-      console.log("hash " + transactionHash);
-      const receipt = await web3.eth.getTransactionReceipt(transactionHash);
-      console.log(receipt);
-    });
+    //await write_contract.collectBounty(taskArgs.paymentAddr, arg0, arg1, arg2, arg3).send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6},);
   
+    tx = await write_contract.collectBounty(taskArgs.paymentAddr, arg0, arg1, arg2, arg3);
+
+    console.log(tx);
+
     console.log("Your Public Key: ");
     console.log(key1.pubKey.rawPubKey);
     console.log("Your Private Key: ");
@@ -318,12 +320,31 @@ task("add_bounty", "Deposit bounty")
     console.log("Your Private Key: ");
     console.log(key.privKey.rawPrivKey);
 
+    /*
     const contract_interface = JSON.parse(fs.readFileSync("artifacts/contracts/libraries/BountyManager.sol/BountyManager.json")).abi;
     var contract = new web3.eth.Contract(contract_interface, CONTRACT_ADDRESS, {
       from: '0x1234567890123456789012345678901234567891', // default from address
       gasPrice: '20000000000' // default gas price in wei, 20 gwei in this case
     });
+    */
 
+    const provider = new ethers.providers.JsonRpcProvider();
+    const contract_interface = JSON.parse(fs.readFileSync("artifacts/contracts/libraries/BountyManager.sol/BountyManager.json")).abi;
+    var contract = new hre.ethers.Contract(CONTRACT_ADDRESS, contract_interface, provider);
+
+    wallet = await hre.ethers.getSigner();
+
+    const write_contract = contract.connect(wallet);
+
+    tx = await write_contract.addBounty(hash_input, key.pubKey.rawPubKey, data.out);
+    console.log(tx);
+
+    tx = await write_contract.query(hash_input);
+    console.log(tx);
+
+    var mse = await contract.mse_caps("1");
+    var pubkey_1 = await contract.pbkeys_1("1");
+    var pubkey_2 = await contract.pbkeys_2("1");
     /*
     await contract.events.AvailableBounties(function(error, event){ console.log(event); })
     .on("connected", function(subscriptionId){
@@ -333,13 +354,6 @@ task("add_bounty", "Deposit bounty")
     .on('data', function(event){
         console.log("event");
         console.log(event); // same results as the optional callback above
-    });
-    */
-
-    await contract.methods.addBounty(hash_input, key.pubKey.rawPubKey, data.out).send({value: web3.utils.toWei(taskArgs.amount, "ether"), from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
-      console.log(transactionHash);
-      const receipt = await web3.eth.getTransactionReceipt(transactionHash);
-      console.log(receipt);
     });
 
     await contract.methods.query(hash_input).send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6}, async function(error, transactionHash){
@@ -352,6 +366,7 @@ task("add_bounty", "Deposit bounty")
     var mse = await contract.methods.mse_caps("1").call();
     var pubkey_1 = await contract.methods.pbkeys_1("1").call();
     var pubkey_2 = await contract.methods.pbkeys_2("1").call();
+    */
 
     console.log(mse);
     console.log(pubkey_1);

@@ -126,7 +126,7 @@ contract BountyManager is Verifier {
           uint[2] memory a,
           uint[2][2] memory b,
           uint[2] memory c,
-          uint[54] memory input
+          uint[131] memory input
       ) public returns (uint256) {
       require(verifyProof(a, b, c, input), "Invalid Proof");
       

@@ -551,7 +551,7 @@ def q_model(m, p, n,
         sXsWsY_denominator=proc(sXsWsY_denominator),
     )
 
-    with open("./quantized_model.json", "w") as f:
+    with open("./artifacts/quantization/inputs_ml.json", "w") as f:
         json.dump(data_all, f, indent=2)
 
 
@@ -658,7 +658,7 @@ def q_dataset(
         sXsWsY_denominator=proc(sXsWsY_denominator),
     )
 
-    with open("./quantized_dataset.json", "w") as f:
+    with open("./artifacts/quantization/inputs_dataset.json", "w") as f:
         json.dump(data_all, f, indent=2)
 
 

@@ -633,7 +633,7 @@ def q_dataset(
     )
 
     data_all = dict(
-        out=proc(Sq_q_quant),
+        out=proc(int(Sq_q_quant)),
         sR2sSq_numerator=proc(sR2sSq_numerator),
         sR2sSq_denominator=proc(sR2sSq_denominator),
         z_R=proc(z_R),
@@ -657,7 +657,6 @@ def q_dataset(
 
     with open("./quantized_model.json", "w") as f:
         json.dump(data_all, f, indent=2)
-
 
 
 def main():
@@ -843,7 +842,10 @@ def main():
     #print("Mean Error actual: ", Mr)
     #print("Mean Error simulated: ", Mr_simulated)
     print("Mean Squared Error actual: ", Sq)
+    print("quantized ", Sq_q)
     print("Mean Squared Error simulated: ", Sq_simulated)
+    print("quantized ", quantization_arb(x=Sq_simulated, s=s_Sq, z=z_Sq))
+    
 
     """
     data_gemm = dict(

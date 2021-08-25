@@ -657,7 +657,7 @@ def q_dataset(
         sXsWsY_denominator=proc(sXsWsY_denominator),
     )
 
-    with open("./quantized_model.json", "w") as f:
+    with open("./quantized_dataset.json", "w") as f:
         json.dump(data_all, f, indent=2)
 
 

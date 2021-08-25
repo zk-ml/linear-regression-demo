@@ -299,7 +299,7 @@ task("claim_bounty", "Claim bounty")
 task("add_bounty", "Deposit bounty") 
   .addParam("amount", "amount to add to bounty", "49")
   .addParam("outFile", "file prefix to export private and public key", "out")
-  .addParam("privKey", "private key", "./key/.private_key")
+  .addParam("privKey", "private key", "./keys/.private_key")
   .setAction(async (taskArgs) => {
 
     const { execSync } = require("child_process");

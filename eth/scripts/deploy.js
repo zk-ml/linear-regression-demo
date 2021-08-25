@@ -17,7 +17,7 @@ async function main() {
   // We get the contract to deploy
   const fs = require("fs");
   const BountyManager = await hre.ethers.getContractFactory("BountyManager");
-  const bm = await BountyManager.deploy(1, 10, 1);
+  const bm = await BountyManager.deploy(20, 4, 1);
 
   await bm.deployed();
 

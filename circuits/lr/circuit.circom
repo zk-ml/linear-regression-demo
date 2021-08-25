@@ -602,4 +602,4 @@ template quant_gemm_mse_enc(m,p,n) {
 
 }
 
-component main = quant_gemm_mse_enc(1,10,1);
+component main = quant_gemm_mse_enc(20,4,1);

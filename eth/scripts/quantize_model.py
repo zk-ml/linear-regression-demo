@@ -345,8 +345,8 @@ def main():
     np.random.seed(random_seed)
 
     # Random matrices
-    m = 1 # Sample Size
-    p = 10  # Feature Dim
+    m = 50 # Sample Size
+    p = 4  # Feature Dim
     n = 1  # Should be 1 for LR
 
     # X

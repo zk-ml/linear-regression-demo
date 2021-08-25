@@ -337,7 +337,7 @@ def quant_matmul_circuit(
 
     return mult
 
-def quantize(m, p, n, 
+def q_model(m, p, n, 
              alpha_X, beta_X,
              alpha_W, beta_W,
              alpha_b, beta_b,

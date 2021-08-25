@@ -283,8 +283,9 @@ task("claim_bounty", "Claim bounty")
   });
 
 task("add_bounty", "Deposit bounty") 
-  .addParam("amount", "amount to add to bounty", "0.01")
+  .addParam("amount", "amount to add to bounty", "499")
   .addParam("outFile", "file prefix to export private and public key", "out")
+  .addParam("privKey", "private key", "0x47c99abed3324a2707c28affff1267e45918ec8c3f20b8aa892e8b065d2942dd")
   .setAction(async (taskArgs) => {
 
     const { execSync } = require("child_process");
@@ -394,11 +395,10 @@ task("add_bounty", "Deposit bounty")
     const BountyManager = await hre.ethers.getContractFactory('BountyManager');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
-    const wallet_raw = new hre.ethers.Wallet("0x47c99abed3324a2707c28affff1267e45918ec8c3f20b8aa892e8b065d2942dd");
+    const wallet_raw = new hre.ethers.Wallet(taskArgs.privKey);
     
     const wallet = wallet_raw.connect(provider);
 
-    //wallet = await hre.ethers.getSigner();
     let overrides = {
       // To convert Ether to Wei:
       value: ethers.utils.parseEther("1.0")     // ether in this case MUST be a string
@@ -412,6 +412,12 @@ task("add_bounty", "Deposit bounty")
 
     console.log(hash_input);
     console.log("Success!");
+
+
+
+    balance = await provider.getBalance(wallet.address);
+    console.log("Current Balance");
+    console.log(ethers.utils.formatEther(balance));
   });
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more

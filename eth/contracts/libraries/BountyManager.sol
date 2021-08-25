@@ -14,6 +14,7 @@ contract BountyManager is Verifier {
   }
 
   event BountyCollected(uint256 collected);
+  event BountyDeposited(uint256 collected);
 
   mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => uint256)))) public bounties;
 
@@ -115,6 +116,7 @@ contract BountyManager is Verifier {
     }
     dataset_alias[dataset_hash] = alias_dataset;
     bounties[dataset_hash][public_key[0]][public_key[1]][mse_cap] += msg.value;
+    emit BountyDeposited(msg.value);
   }
 
   function collectBounty(
@@ -127,8 +129,8 @@ contract BountyManager is Verifier {
       require(verifyProof(a, b, c, input), "Invalid Proof");
       
       uint index_offset = m * p + n * p * 2 + n * 2;
-      uint256 public_key_0 = input[index_offset + 1];
-      uint256 public_key_1 = input[index_offset + 2];
+      uint256 public_key_0 = input[index_offset];
+      uint256 public_key_1 = input[index_offset + 1];
       uint256 dataset_hash = input[1];
       uint256 mse_cap = input[0];
       uint256 topay = bounties[dataset_hash][public_key_0][public_key_1][mse_cap];

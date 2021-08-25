@@ -260,30 +260,38 @@ task("claim_bounty", "Claim bounty")
 
     console.log([arg0, arg1, arg2]);
     console.log("Paying " + taskArgs.paymentAddr);
+    console.log("With balance");
+    balance = await provider.getBalance(taskArgs.paymentAddr);
+    console.log(ethers.utils.formatEther(balance));
     
     //arg3[0] = "133";
 
-    // Receive an event when ANY transfer occurs
-    write_contract.on("BountyCollected", (x) => {
-      console.log("Collected Bounty: " + (x.toString()));
-    });
-    //console.log(arg3);
-
+    //const index_offset = m * p + n * p * 2 + n * 2;
+    //console.log(arg3[index_offset]);
+    console.log(arg3[index_offset+1]);
+    console.log(arg3[index_offset+2]);
     //console.log(arg0, arg1, arg2, arg3);
 
     tx = await write_contract.collectBounty(taskArgs.paymentAddr, arg0, arg1, arg2, arg3);
 
-    console.log(tx);
+    await write_contract.on("BountyCollected", (x) => {
+      console.log("Collected Bounty: " + (x.toString()));
+    });
+    //console.log(tx);
 
     console.log("Your Public Key: ");
     console.log(key.pubKey.rawPubKey);
     console.log("Your Private Key: ");
     console.log(key.privKey.rawPrivKey);
     console.log("Success!");
+
+    balance = await provider.getBalance(taskArgs.paymentAddr);
+    console.log("Current Balance");
+    console.log(ethers.utils.formatEther(balance));
   });
 
 task("add_bounty", "Deposit bounty") 
-  .addParam("amount", "amount to add to bounty", "499")
+  .addParam("amount", "amount to add to bounty", "49")
   .addParam("outFile", "file prefix to export private and public key", "out")
   .addParam("privKey", "private key", "0x47c99abed3324a2707c28affff1267e45918ec8c3f20b8aa892e8b065d2942dd")
   .setAction(async (taskArgs) => {
@@ -401,7 +409,7 @@ task("add_bounty", "Deposit bounty")
 
     let overrides = {
       // To convert Ether to Wei:
-      value: ethers.utils.parseEther("1.0")     // ether in this case MUST be a string
+      value: ethers.utils.parseEther(taskArgs.amount)     // ether in this case MUST be a string
     };
 
     const write_contract = contract.connect(wallet);
@@ -412,8 +420,6 @@ task("add_bounty", "Deposit bounty")
 
     console.log(hash_input);
     console.log("Success!");
-
-
 
     balance = await provider.getBalance(wallet.address);
     console.log("Current Balance");

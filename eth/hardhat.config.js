@@ -399,10 +399,14 @@ task("add_bounty", "Deposit bounty")
     const wallet = wallet_raw.connect(provider);
 
     //wallet = await hre.ethers.getSigner();
+    let overrides = {
+      // To convert Ether to Wei:
+      value: ethers.utils.parseEther("1.0")     // ether in this case MUST be a string
+    };
 
     const write_contract = contract.connect(wallet);
 
-    tx = await write_contract.addBounty(hash_input, "dataset", key.pubKey.rawPubKey, data.out);
+    tx = await write_contract.addBounty(hash_input, "dataset", key.pubKey.rawPubKey, data.out, overrides);
    
     console.log(tx)
 

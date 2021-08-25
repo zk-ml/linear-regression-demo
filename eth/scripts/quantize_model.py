@@ -11,6 +11,24 @@ ALPHA_Q = 4
 BETA_Q = 2 ** 16
 LIMIT_DENOM = 2 ** 32
 
+def proc(l):
+    import warnings
+
+    def proc_int(x):
+        if x < 0:
+            warnings.warn("Results are negative, circom may not be happy")
+            return P-x
+        return int(x)
+
+    if type(l) is int:
+        return proc_int(l)
+    elif type(l) is float:
+        assert False, "cannot be float"
+    elif type(l[0]) is int:
+        return [proc_int(x) for x in l]
+
+    return [[proc_int(x) for x in j] for j in l]
+
 def quantization(x, s, z, alpha_q, beta_q):
 
     x_q = np.round(1 / s * x + z, decimals=0)
@@ -505,24 +523,6 @@ def q_model(m, p, n,
     print("Mean Squared Error actual: ", Sq)
     print("Mean Squared Error simulated: ", Sq_simulated)
 
-    def proc(l):
-        import warnings
-
-        def proc_int(x):
-            if x < 0:
-                warnings.warn("Results are negative, circom may not be happy")
-                return P-x
-            return int(x)
-
-        if type(l) is int:
-            return proc_int(l)
-        elif type(l) is float:
-            assert False, "cannot be float"
-        elif type(l[0]) is int:
-            return [proc_int(x) for x in l]
-
-        return [[proc_int(x) for x in j] for j in l]
-
     data_all = dict(
         out=proc(int(_Sq_q_simulated)),
         sR2sSq_numerator=proc(sR2sSq_numerator),
@@ -552,7 +552,7 @@ def q_model(m, p, n,
         json.dump(data_all, f, indent=2)
 
 
-def q_dataset(m, p, n, 
+def q_dataset(
              alpha_X, beta_X,
              alpha_W, beta_W,
              alpha_b, beta_b,
@@ -586,7 +586,7 @@ def q_dataset(m, p, n,
     # Y_res
     s_R, z_R = generate_quantization_arb_constants(alpha=alpha_R, beta=beta_R)
     Sq_q_quant = quantization_arb(x=mse, s=s_R, z=z_R)
-    
+
     # Squared Error
     s_Sq, z_Sq = generate_quantization_arb_constants(alpha=alpha_S, beta=beta_S)
 
@@ -621,30 +621,16 @@ def q_dataset(m, p, n,
         sYtsR.denominator,
     )
     
+    sR2sSq = Fraction((s_R ** 2) / s_Sq).limit_denominator(LIMIT_DENOM)
+
 
     (
-        Sq_q_simulated,
         sR2sSq_numerator,
         sR2sSq_denominator,
-    ) = quantization_mean_squared_error(R_q_simulated, s_R, s_Sq, z_R, z_Sq, m, n)
-
-    def proc(l):
-        import warnings
-
-        def proc_int(x):
-            if x < 0:
-                warnings.warn("Results are negative, circom may not be happy")
-                return P-x
-            return int(x)
-
-        if type(l) is int:
-            return proc_int(l)
-        elif type(l) is float:
-            assert False, "cannot be float"
-        elif type(l[0]) is int:
-            return [proc_int(x) for x in l]
-
-        return [[proc_int(x) for x in j] for j in l]
+    ) = (
+        sR2sSq.numerator,
+        sR2sSq.denominator
+    )
 
     data_all = dict(
         out=proc(Sq_q_quant),
@@ -659,8 +645,6 @@ def q_dataset(m, p, n,
         sYtsR_denominator=proc(sYtsR_denominator),
         constant=proc(constant),
         X_q=proc(X_q),
-        W_q=proc(W_q),
-        b_q=proc(b_q),
         z_X=proc(z_X),
         z_W=proc(z_W),
         z_b=proc(z_b),
@@ -860,24 +844,6 @@ def main():
     #print("Mean Error simulated: ", Mr_simulated)
     print("Mean Squared Error actual: ", Sq)
     print("Mean Squared Error simulated: ", Sq_simulated)
-
-    def proc(l):
-        import warnings
-
-        def proc_int(x):
-            if x < 0:
-                warnings.warn("Results are negative, circom may not be happy")
-                return P-x
-            return int(x)
-
-        if type(l) is int:
-            return proc_int(l)
-        elif type(l) is float:
-            assert False, "cannot be float"
-        elif type(l[0]) is int:
-            return [proc_int(x) for x in l]
-
-        return [[proc_int(x) for x in j] for j in l]
 
     """
     data_gemm = dict(

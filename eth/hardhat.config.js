@@ -47,7 +47,7 @@ task("list_bounties", "List bounties")
     console.log("Available bounties on dataset: " + alias);
     tx = await write_contract.query_bounties(taskArgs.datasetHash);
     const bounties = tx.map(function (x) { 
-      return {"PublicKey-1": x[0].toString(16), "PublicKey-2": x[1].toString(16), "MSE-Cap":  x[2].toString(16)}; 
+      return {"PublicKey-1": x[0].toString(), "PublicKey-2": x[1].toString(), "MSE-Cap":  x[2].toString()}; 
     });
     console.log(bounties);  
   });
@@ -110,7 +110,10 @@ task("claim_bounty", "Claim bounty")
     */
 
     const key2 = new Keypair();
+    console.log('---------');
     key2.pubKey.rawPubKey = pubKey;
+    console.log(pubKey);
+    console.log(key2.pubKey.rawPubKey);
 
     const sharedKey = Keypair.genEcdhSharedKey(key.privKey, key2.pubKey);
 
@@ -268,8 +271,8 @@ task("claim_bounty", "Claim bounty")
 
     const index_offset = m * p + n * p * 2 + n * 2;
     console.log(key2.pubKey);
-    console.log(arg3[index_offset]);
-    console.log(arg3[index_offset+1]);
+    console.log(arg3[index_offset+2]);
+    console.log(arg3[index_offset+3]);
     //console.log(arg3[index_offset+2]);
     //console.log(arg0, arg1, arg2, arg3);
 

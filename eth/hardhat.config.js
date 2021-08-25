@@ -9,7 +9,7 @@ require("@nomiclabs/hardhat-web3");
 require("maci-domainobjs");
 require("maci-crypto");
 
-const CONTRACT_ADDRESS = "0x0165878A594ca255338adfa4d48449f69242Eb8F";
+const CONTRACT_ADDRESS = "0xE6E340D132b5f46d1e472DebcD681B2aBc16e57E";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -266,10 +266,10 @@ task("claim_bounty", "Claim bounty")
     
     //arg3[0] = "133";
 
-    //const index_offset = m * p + n * p * 2 + n * 2;
-    //console.log(arg3[index_offset]);
+    const index_offset = m * p + n * p * 2 + n * 2;
+    console.log(arg3[index_offset]);
     console.log(arg3[index_offset+1]);
-    console.log(arg3[index_offset+2]);
+    //console.log(arg3[index_offset+2]);
     //console.log(arg0, arg1, arg2, arg3);
 
     tx = await write_contract.collectBounty(taskArgs.paymentAddr, arg0, arg1, arg2, arg3);

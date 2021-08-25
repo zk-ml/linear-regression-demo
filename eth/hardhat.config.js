@@ -94,7 +94,7 @@ task("claim_bounty", "Claim bounty")
     const mimc7 = require('./node_modules/circomlib/src/mimc7.js');
     console.log(Keypair);
 
-    const key1 = new Keypair();
+    const key = new Keypair();
     const pubKey = JSON.parse(fs.readFileSync(taskArgs.publicKey));
     console.log(pubKey);
     pubKey[0] = BigInt(pubKey[0]);
@@ -111,7 +111,7 @@ task("claim_bounty", "Claim bounty")
     const key2 = new Keypair();
     key2.pubKey.rawPubKey = pubKey;
 
-    const sharedKey = Keypair.genEcdhSharedKey(key1.privKey, key2.pubKey);
+    const sharedKey = Keypair.genEcdhSharedKey(key.privKey, key2.pubKey);
 
     const rawdata = fs.readFileSync('./artifacts/quantization/inputs_ml.json');
     const data = JSON.parse(rawdata);
@@ -207,7 +207,7 @@ task("claim_bounty", "Claim bounty")
 
     const _input = {
       hash_input: hash_input,
-      private_key: key1.privKey.asCircuitInputs(),
+      private_key: key.privKey.asCircuitInputs(),
       public_key: key2.pubKey.asCircuitInputs(),
       W_q_enc : W_q_enc,
       b_q_enc : b_q_enc,
@@ -276,9 +276,9 @@ task("claim_bounty", "Claim bounty")
     console.log(tx);
 
     console.log("Your Public Key: ");
-    console.log(key1.pubKey.rawPubKey);
+    console.log(key.pubKey.rawPubKey);
     console.log("Your Private Key: ");
-    console.log(key1.privKey.rawPrivKey);
+    console.log(key.privKey.rawPrivKey);
     console.log("Success!");
   });
 

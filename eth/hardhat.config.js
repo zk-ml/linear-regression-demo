@@ -9,7 +9,6 @@ require("@nomiclabs/hardhat-web3");
 require("maci-domainobjs");
 require("maci-crypto");
 
-const CONTRACT_ADDRESS = "0xE6E340D132b5f46d1e472DebcD681B2aBc16e57E";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -36,6 +35,7 @@ task("list_bounties", "List bounties")
     const fs = require("fs");
     const provider = new hre.ethers.providers.JsonRpcProvider();
     const BountyManager = await hre.ethers.getContractFactory('BountyManager');
+    const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
     wallet = await hre.ethers.getSigner();
@@ -57,6 +57,7 @@ task("list_bounties", "List bounties")
     const fs = require("fs");
     const provider = new hre.ethers.providers.JsonRpcProvider();
     const BountyManager = await hre.ethers.getContractFactory('BountyManager');
+    const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
     wallet = await hre.ethers.getSigner();
@@ -252,6 +253,7 @@ task("claim_bounty", "Claim bounty")
 
     const provider = new hre.ethers.providers.JsonRpcProvider();
     const BountyManager = await hre.ethers.getContractFactory('BountyManager');
+    const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
     wallet = await hre.ethers.getSigner();
@@ -401,6 +403,7 @@ task("add_bounty", "Deposit bounty")
     const provider = new hre.ethers.providers.JsonRpcProvider();
 
     const BountyManager = await hre.ethers.getContractFactory('BountyManager');
+    const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
     const wallet_raw = new hre.ethers.Wallet(taskArgs.privKey);

@@ -15,6 +15,7 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
+  const fs = require("fs");
   const BountyManager = await hre.ethers.getContractFactory("BountyManager");
   const bm = await BountyManager.deploy(1, 10, 1);
 
@@ -38,7 +39,13 @@ async function main() {
 
   console.log(res)
 
-  console.log("Greeter deployed to:", bm.address);
+  console.log("BountyManager deployed to:", bm.address);
+
+  fs.writeFileSync(
+    './artifacts/.env_contract',
+    bm.address,
+    () => {},
+  );
 
   console.log(await provider.getBalance(bm.address));
   console.log(await provider.getTransactionCount(bm.address));

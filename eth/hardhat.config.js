@@ -309,7 +309,7 @@ task("add_bounty", "Deposit bounty")
 
     const rawdata = fs.readFileSync('./artifacts/quantization/inputs_dataset.json');
     const data = JSON.parse(rawdata);
-    console.log(data);
+    //console.log(data);
 
     function tobigint(value) {
       return BigInt(value);
@@ -415,10 +415,9 @@ task("add_bounty", "Deposit bounty")
 
     tx = await write_contract.addBounty(hash_input, "dataset", key.pubKey.rawPubKey, data.out, overrides);
    
-    console.log(tx)
-
-    console.log(hash_input);
-    console.log("Success!");
+    //console.log(tx)
+    //console.log(hash_input);
+    //console.log("Success!");
 
     balance = await provider.getBalance(wallet.address);
     console.log("Current Balance");

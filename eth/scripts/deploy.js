@@ -37,7 +37,7 @@ async function main() {
 
   res = await wallet.sendTransaction(tx);
 
-  console.log(res)
+  //console.log(res)
 
   console.log("BountyManager deployed to:", bm.address);
 

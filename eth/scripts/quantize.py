@@ -750,4 +750,16 @@ def quant_model(model, setting):
     return 
 
 if __name__ == "__main__":
-    print("oh hey there")
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--mode")
+    parser.add_argument("--setting")
+    parser.add_argument("--model")
+    args = parser.parse_args()
+
+    if args.mode == "model":
+        quant_model(args.model, args.setting)
+    elif args.mode == "dataset":
+        quant_dataset(args.model, args.setting)
+    else:
+        assert False

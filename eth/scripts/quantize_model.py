@@ -118,7 +118,7 @@ def quant_error_circuit(Y_q, Yt_q, s_R, z_R, s_Y, z_Y, s_Yt, z_Yt, m, n):
         - int(z_Y * s_Y / s_R)
         + int(z_Yt * s_Yt / s_R)
     )
-    print(R_q - R_q_true)
+    #print(R_q - R_q_true)
 
     return R_q
 
@@ -153,7 +153,7 @@ def quantization_mean_squared_error(R_q, s_R, s_Sq, z_R, z_Sq, m, n):
     )
 
     # print(S_true, S)
-    print("diff mse", abs(S_true - S).T)
+    # print("diff mse", abs(S_true - S).T)
     return S.sum() // (m * n), sR2sSq.numerator, sR2sSq.denominator
 
 
@@ -223,7 +223,7 @@ def quantization_matrix_multiplication_arb(
         ).astype(np.int64)
     ).astype(np.int64)
 
-    print("diff quant matmul: ", abs(Y_q_simulated_q - Y_q_simulated).mean())
+    #print("diff quant matmul: ", abs(Y_q_simulated_q - Y_q_simulated).mean())
 
     return (
         Y_q_simulated_q,
@@ -290,8 +290,8 @@ def quant_matmul_circuit(
     for i0 in range(n):
         b0[0, i0] = (b0[0, i0] - z_b) * sbsY_numerator // sbsY_denominator + z_Y
 
-    print(b0 - z_b)
-    print("b0 ", b0)
+    #print(b0 - z_b)
+    #print("b0 ", b0)
     # b0 = z_Y
     # b0 += (b_q.astype(np.int64) - z_b).astype(np.int64) * sbsY_numerator // sbsY_denominator
     # print(b0)
@@ -444,7 +444,7 @@ def main():
     )
     assert (Y_q_simulated == _Y_q_simulated).all()
     print("gemm assertion passed")
-    print("_Y_q_simulated", _Y_q_simulated)
+    #print("_Y_q_simulated", _Y_q_simulated)
 
     (
         R_q_simulated,
@@ -506,20 +506,20 @@ def main():
     Sq_simulated = dequantization(Sq_q_simulated, s=s_Sq, z=z_Sq)
     Y_simulated = dequantization(x_q=Y_q_simulated, s=s_Y, z=z_Y)
 
-    print("Args")
-    print(sbsY_numerator, sbsY_denominator, sXsWsY_numerator, sXsWsY_denominator)
-    print(sYsR_numerator, sYsR_denominator, sYtsR_numerator, sYtsR_denominator)
-    print(sR2sSq_numerator, sR2sSq_denominator)
+    #print("Args")
+    #print(sbsY_numerator, sbsY_denominator, sXsWsY_numerator, sXsWsY_denominator)
+    #print(sYsR_numerator, sYsR_denominator, sYtsR_numerator, sYtsR_denominator)
+    #print(sR2sSq_numerator, sR2sSq_denominator)
 
-    print("Sq actual ", Sq_q.T)
-    print("Sq computed ", Sq_q_simulated.T)
-    print("R_q actual ", R_q.T)
-    print("R_q computed ", R_q_simulated.T)
-    print("R_q diff ", R_q.T - R_q_simulated.T)
-    print("Mr_q actual ", Mr_q)
-    print("Mr_q computed ", Mr_q_simulated)
-    print("Mean Error actual: ", Mr)
-    print("Mean Error simulated: ", Mr_simulated)
+    #print("Sq actual ", Sq_q.T)
+    #print("Sq computed ", Sq_q_simulated.T)
+    #print("R_q actual ", R_q.T)
+    #print("R_q computed ", R_q_simulated.T)
+    #print("R_q diff ", R_q.T - R_q_simulated.T)
+    #print("Mr_q actual ", Mr_q)
+    #print("Mr_q computed ", Mr_q_simulated)
+    #print("Mean Error actual: ", Mr)
+    #print("Mean Error simulated: ", Mr_simulated)
     print("Mean Squared Error actual: ", Sq)
     print("Mean Squared Error simulated: ", Sq_simulated)
 
@@ -541,6 +541,7 @@ def main():
 
         return [[proc_int(x) for x in j] for j in l]
 
+    """
     data_gemm = dict(
         out=proc(_Y_q_simulated),
         X_q=proc(X_q),
@@ -598,6 +599,7 @@ def main():
         sYtsR_denominator=proc(sYtsR_denominator),
         constant=proc(constant),
     )
+    """
 
     data_all = dict(
         out=proc(int(_Sq_q_simulated)),
@@ -633,14 +635,14 @@ def main():
     #with open("./artifacts/quantization/inputs_mse.json", "w") as f:
     #    json.dump(data_mse, f, indent=2)
 
-    with open("./artifacts/quantization/inputs_ml.json", "w") as f:
+    with open("./artifacts/quantization/inputs_dataset.json", "w") as f:
         json.dump(data_all, f, indent=2)
 
     #with open("./artifacts/quantization/inputs_interm.json", "w") as f:
     #    json.dump(data_interm, f, indent=2)
 
-    print("diff e ", abs(Y_expected - Y_simulated).mean())
-    print("diff q ", abs(Y_q_expected - Y_q_simulated).mean())
+    #print("diff e ", abs(Y_expected - Y_simulated).mean())
+    #print("diff q ", abs(Y_q_expected - Y_q_simulated).mean())
 
 if __name__ == "__main__":
 

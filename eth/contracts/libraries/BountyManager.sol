@@ -13,7 +13,7 @@ contract BountyManager is Verifier {
     uint256 mse;
   }
 
-  event SetPurpose(address sender, string purpose);
+  event BountyCollected(uint256 collected);
 
   mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => uint256)))) public bounties;
 
@@ -138,6 +138,7 @@ contract BountyManager is Verifier {
       }
       bounties[dataset_hash][public_key_0][public_key_1][mse_cap] = 0;
       to.transfer(topay);
+      emit BountyCollected(topay);
       return topay;
   }
 

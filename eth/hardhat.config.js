@@ -9,7 +9,7 @@ require("@nomiclabs/hardhat-web3");
 require("maci-domainobjs");
 require("maci-crypto");
 
-const CONTRACT_ADDRESS = "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6";
+const CONTRACT_ADDRESS = "0x0165878A594ca255338adfa4d48449f69242Eb8F";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -34,7 +34,7 @@ task("list_bounties", "List bounties")
   .addParam("datasetHash", "Dataset hash", "15681440893605958136105542719628389980032562080249509287477198087707031153419")
   .setAction(async (taskArgs) => {
     const fs = require("fs");
-    const provider = new ethers.providers.JsonRpcProvider();
+    const provider = new hre.ethers.providers.JsonRpcProvider();
     const BountyManager = await hre.ethers.getContractFactory('BountyManager');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
@@ -55,7 +55,7 @@ task("list_bounties", "List bounties")
   task("list_datasets", "List of datasets with alias")
   .setAction(async (taskArgs) => {
     const fs = require("fs");
-    const provider = new ethers.providers.JsonRpcProvider();
+    const provider = new hre.ethers.providers.JsonRpcProvider();
     const BountyManager = await hre.ethers.getContractFactory('BountyManager');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
@@ -244,13 +244,12 @@ task("claim_bounty", "Claim bounty")
 
     function convert(x) {return '0x'+BigInt(x).toString(16);}
 
-    arg0 = [proof.pi_a[0], proof.pi_a[1]].map(convert);
-    arg1 = [[proof.pi_b[0][1], proof.pi_b[0][0]].map(convert), [proof.pi_b[1][1], proof.pi_b[1][0]].map(convert)]
-    arg2 = [proof.pi_c[0], proof.pi_c[1]].map(convert);
-    arg3 = publicSignals.map(convert);
+    arg0 = [proof.pi_a[0], proof.pi_a[1]];
+    arg1 = [[proof.pi_b[0][1], proof.pi_b[0][0]], [proof.pi_b[1][1], proof.pi_b[1][0]]]
+    arg2 = [proof.pi_c[0], proof.pi_c[1]];
+    arg3 = publicSignals;
 
-
-    const provider = new ethers.providers.JsonRpcProvider();
+    const provider = new hre.ethers.providers.JsonRpcProvider();
     const BountyManager = await hre.ethers.getContractFactory('BountyManager');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
@@ -263,16 +262,17 @@ task("claim_bounty", "Claim bounty")
     
     //arg3[0] = "133";
 
+    // Receive an event when ANY transfer occurs
+    write_contract.on("BountyCollected", (x) => {
+      console.log("Collected Bounty: " + (x.toString()));
+    });
     //console.log(arg3);
-    //await write_contract.collectBounty(taskArgs.paymentAddr, arg0, arg1, arg2, arg3).send({from: '0x2546BcD3c84621e976D8185a91A922aE77ECEc30', gas: 2e6},);
-  
-    console.log(arg0, arg1, arg2, arg3);
+
+    //console.log(arg0, arg1, arg2, arg3);
 
     tx = await write_contract.collectBounty(taskArgs.paymentAddr, arg0, arg1, arg2, arg3);
 
-    await provider.sendTransaction(tx).then(console.log);
-
-    //console.log(tx);
+    console.log(tx);
 
     console.log("Your Public Key: ");
     console.log(key1.pubKey.rawPubKey);
@@ -373,18 +373,22 @@ task("add_bounty", "Deposit bounty")
     console.log("Your Private Key: ");
     console.log(key.privKey.rawPrivKey);
 
-    const provider = new ethers.providers.JsonRpcProvider();
+    const provider = new hre.ethers.providers.JsonRpcProvider();
 
     const BountyManager = await hre.ethers.getContractFactory('BountyManager');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
-    wallet = await hre.ethers.getSigner();
+    const wallet_raw = new hre.ethers.Wallet("0x47c99abed3324a2707c28affff1267e45918ec8c3f20b8aa892e8b065d2942dd");
+    
+    const wallet = wallet_raw.connect(provider);
+
+    //wallet = await hre.ethers.getSigner();
 
     const write_contract = contract.connect(wallet);
 
     tx = await write_contract.addBounty(hash_input, "dataset", key.pubKey.rawPubKey, data.out);
-    
-    await provider.sendTransaction(tx).then(console.log);
+   
+    console.log(tx)
 
     console.log(hash_input);
     console.log("Success!");

@@ -4,6 +4,8 @@ import sys
 from fractions import Fraction
 
 import numpy as np
+import pandas as pd
+import json
 
 P = 21888242871839275222246405745257275088548364400416034343698204186575808495617
 
@@ -661,300 +663,91 @@ def q_dataset(
         json.dump(data_all, f, indent=2)
 
 
-def main():
+def quant_dataset(model, setting):
 
-    # Set random seed for reproducibility
-    random_seed = 0
-    np.random.seed(random_seed)
+    data = json.load(open(setting, 'rb'))
 
-    # Random matrices
-    m = 20 # Sample Size
-    p = 4  # Feature Dim
-    n = 1  # Should be 1 for LR
+    alpha_X = data['alpha_X']
+    beta_X = data['beta_X']
+   
+    alpha_W = data['alpha_W']
+    beta_W = data['beta_W']
+   
+    alpha_b = data['alpha_b']
+    beta_b = data['beta_b']
+   
+    alpha_Y = data['alpha_Y']
+    beta_Y = data['beta_Y']
+   
+    alpha_Yt = data['alpha_Yt']
+    beta_Yt = data['beta_Yt']
+   
+    alpha_R = data['alpha_R']
+    beta_R = data['beta_R']
+   
+    alpha_S = data['alpha_S']
+    beta_S = data['beta_S']
 
-    # X
-    alpha_X = -10.0
-    beta_X = 8.0
-    s_X, z_X = generate_quantization_arb_constants(alpha=alpha_X, beta=beta_X)
-    X = np.random.uniform(low=alpha_X, high=beta_X, size=(m, p)).astype(np.float128)
-    X_q = quantization_arb(x=X, s=s_X, z=z_X)
+    mse_target = data['mse_target']
 
-    # W
-    alpha_W = -20.0
-    beta_W = 10.0
-    s_W, z_W = generate_quantization_arb_constants(alpha=alpha_W, beta=beta_W)
-    W = np.random.uniform(low=alpha_W, high=beta_W, size=(p, n)).astype(np.float128)
-    W_q = quantization_arb(x=W, s=s_W, z=z_W)
+    X = np.load(f'{model}/X.npy')
+    Y = np.load(f'{model}/Y.npy')
 
-    # b
-    alpha_b = -5.0
-    beta_b = 5.0
-    s_b, z_b = generate_quantization_arb_constants(alpha=alpha_b, beta=beta_b)
-    b = np.random.uniform(low=alpha_b, high=beta_b, size=(1, n)).astype(np.float128)
-    b_q = quantization_arb(x=b, s=s_b, z=z_b)
+    q_dataset(
+         alpha_X, beta_X,
+         alpha_W, beta_W,
+         alpha_b, beta_b,
+         alpha_Y, beta_Y,
+         alpha_Yt, beta_Yt,
+         alpha_R, beta_R,
+         alpha_S, beta_S,
+         X, Y, mse_target)
 
-    # Y
-    alpha_Y = -50.0
-    beta_Y = 50.0
-    s_Y, z_Y = generate_quantization_arb_constants(alpha=alpha_Y, beta=beta_Y)
-    Y_expected = np.matmul(X, W) + b
-    Y_q_expected = quantization_arb(x=Y_expected, s=s_Y, z=z_Y)
 
-    # Y_true
-    alpha_Yt = -200.0
-    beta_Yt = 200.0
-    s_Yt, z_Yt = generate_quantization_arb_constants(alpha=alpha_Yt, beta=beta_Yt)
-    Yt_expected = np.random.uniform(low=alpha_Yt, high=beta_Yt, size=(m, n)).astype(
-        np.float128
-    )
-    Yt_q_expected = quantization_arb(x=Yt_expected, s=s_Yt, z=z_Yt)
+def quant_model(model, setting):
 
-    # Y_res
-    alpha_R = -5000.0
-    beta_R = 5000.0
-    s_R, z_R = generate_quantization_arb_constants(alpha=alpha_R, beta=beta_R)
+    data = json.load(open(setting, 'rb'))
 
-    # Squared Error
-    alpha_S = 0
-    beta_S = 800000
-    s_Sq, z_Sq = generate_quantization_arb_constants(alpha=alpha_S, beta=beta_S)
+    m = data['m']
+    p = data['p']
+    n = data['n']
+    alpha_X = data['alpha_X']
+    beta_X = data['beta_X']
+   
+    alpha_W = data['alpha_W']
+    beta_W = data['beta_W']
+   
+    alpha_b = data['alpha_b']
+    beta_b = data['beta_b']
+   
+    alpha_Y = data['alpha_Y']
+    beta_Y = data['beta_Y']
+   
+    alpha_Yt = data['alpha_Yt']
+    beta_Yt = data['beta_Yt']
+   
+    alpha_R = data['alpha_R']
+    beta_R = data['beta_R']
+   
+    alpha_S = data['alpha_S']
+    beta_S = data['beta_S']
 
-    R = Y_expected - Yt_expected
-    Mr = R.mean()
-    Sq = (R ** 2).mean()
+    X = np.load(f'{model}/X.npy')
+    W = np.load(f'{model}/W.npy')
+    b = np.load(f'{model}/b.npy')
+    Y = np.load(f'{model}/Y.npy')
 
-    Sq_q = quantization_arb(x=Sq, s=s_Sq, z=z_Sq)
-    R_q = quantization_arb(x=R, s=s_R, z=z_R)
-    Mr_q = quantization_arb(x=Mr, s=s_R, z=z_R)
+    q_model(m, p, n, 
+         alpha_X, beta_X,
+         alpha_W, beta_W,
+         alpha_b, beta_b,
+         alpha_Y, beta_Y,
+         alpha_Yt, beta_Yt,
+         alpha_R, beta_R,
+         alpha_S, beta_S,
+         X, W, b, Y)
 
-    (
-        Y_q_simulated,
-        sbsY_numerator,
-        sbsY_denominator,
-        sXsWsY_numerator,
-        sXsWsY_denominator,
-        p,
-    ) = quantization_matrix_multiplication_arb(
-        X_q=X_q,
-        W_q=W_q,
-        b_q=b_q,
-        s_X=s_X,
-        z_X=z_X,
-        s_W=s_W,
-        z_W=z_W,
-        s_b=s_b,
-        z_b=z_b,
-        s_Y=s_Y,
-        z_Y=z_Y,
-    )
-
-    # Sanity Check
-    _Y_q_simulated = quant_matmul_circuit(
-        X_q=X_q,
-        W_q=W_q,
-        b_q=b_q,
-        z_X=z_X,
-        z_W=z_W,
-        z_b=z_b,
-        z_Y=z_Y,
-        m=m,
-        n=n,
-        p=p,
-        sbsY_numerator=sbsY_numerator,
-        sbsY_denominator=sbsY_denominator,
-        sXsWsY_numerator=sXsWsY_numerator,
-        sXsWsY_denominator=sXsWsY_denominator,
-    )
-    assert (Y_q_simulated == _Y_q_simulated).all()
-    print("gemm assertion passed")
-    #print("_Y_q_simulated", _Y_q_simulated)
-
-    (
-        R_q_simulated,
-        sYsR_numerator,
-        sYsR_denominator,
-        sYtsR_numerator,
-        sYtsR_denominator,
-        constant,
-    ) = quantization_error(
-        Y_q=Y_q_simulated,
-        Yt_q=Yt_q_expected,
-        s_R=s_R,
-        z_R=z_R,
-        s_Y=s_Y,
-        z_Y=z_Y,
-        s_Yt=s_Yt,
-        z_Yt=z_Yt,
-    )
-
-    _R_q_simulated = quant_error_circuit(
-        Y_q=Y_q_simulated,
-        Yt_q=Yt_q_expected,
-        s_R=s_R,
-        z_R=z_R,
-        s_Y=s_Y,
-        z_Y=z_Y,
-        s_Yt=s_Yt,
-        z_Yt=z_Yt,
-        m=m,
-        n=n,
-    )
-
-    assert (_R_q_simulated == R_q_simulated).all()
-    print("error assertion passed")
-    (
-        Sq_q_simulated,
-        sR2sSq_numerator,
-        sR2sSq_denominator,
-    ) = quantization_mean_squared_error(R_q_simulated, s_R, s_Sq, z_R, z_Sq, m, n)
-
-    Mr_q_simulated = quantization_mean_error(
-        Y_q=Y_q_simulated,
-        Yt_q=Yt_q_expected,
-        s_R=s_R,
-        z_R=z_R,
-        s_Y=s_Y,
-        z_Y=z_Y,
-        s_Yt=s_Yt,
-        z_Yt=z_Yt,
-        m=m,
-    )
-
-    _Sq_q_simulated = quant_mse(R_q_simulated, s_R, s_Sq, z_R, z_Sq, m, n)
-
-    assert (_Sq_q_simulated == Sq_q_simulated).all(), (_Sq_q_simulated, Sq_q_simulated)
-    print("mse assertion passed")
-
-    Mr_simulated = dequantization(Mr_q_simulated, s=s_R, z=z_R)
-    Sq_simulated = dequantization(Sq_q_simulated, s=s_Sq, z=z_Sq)
-    Y_simulated = dequantization(x_q=Y_q_simulated, s=s_Y, z=z_Y)
-
-    #print("Args")
-    #print(sbsY_numerator, sbsY_denominator, sXsWsY_numerator, sXsWsY_denominator)
-    #print(sYsR_numerator, sYsR_denominator, sYtsR_numerator, sYtsR_denominator)
-    #print(sR2sSq_numerator, sR2sSq_denominator)
-
-    #print("Sq actual ", Sq_q.T)
-    #print("Sq computed ", Sq_q_simulated.T)
-    #print("R_q actual ", R_q.T)
-    #print("R_q computed ", R_q_simulated.T)
-    #print("R_q diff ", R_q.T - R_q_simulated.T)
-    #print("Mr_q actual ", Mr_q)
-    #print("Mr_q computed ", Mr_q_simulated)
-    #print("Mean Error actual: ", Mr)
-    #print("Mean Error simulated: ", Mr_simulated)
-    print("Mean Squared Error actual: ", Sq)
-    print("quantized ", Sq_q)
-    print("Mean Squared Error simulated: ", Sq_simulated)
-    print("quantized ", quantization_arb(x=Sq_simulated, s=s_Sq, z=z_Sq))
-    
-
-    """
-    data_gemm = dict(
-        out=proc(_Y_q_simulated),
-        X_q=proc(X_q),
-        W_q=proc(W_q),
-        b_q=proc(b_q),
-        z_X=proc(z_X),
-        z_W=proc(z_W),
-        z_b=proc(z_b),
-        z_Y=proc(z_Y),
-        sbsY_numerator=proc(sbsY_numerator),
-        sbsY_denominator=proc(sbsY_denominator),
-        sXsWsY_numerator=proc(sXsWsY_numerator),
-        sXsWsY_denominator=proc(sXsWsY_denominator),
-    )
-    print(_Y_q_simulated)
-
-    data_error = dict(
-        out=proc(_R_q_simulated),
-        Y_q=proc(Y_q_simulated),
-        Yt_q=proc(Yt_q_expected),
-        sYsR_numerator=proc(sYsR_numerator),
-        sYsR_denominator=proc(sYsR_denominator),
-        sYtsR_numerator=proc(sYtsR_numerator),
-        sYtsR_denominator=proc(sYtsR_denominator),
-        constant=proc(constant),
-    )
-    print(_R_q_simulated)
-
-    data_mse = dict(
-        out=proc(int(_Sq_q_simulated)),
-        R_q=proc(_R_q_simulated),
-        sR2sSq_numerator=proc(sR2sSq_numerator),
-        sR2sSq_denominator=proc(sR2sSq_denominator),
-        z_R=proc(z_R),
-        z_Sq=proc(z_Sq),
-    )
-
-    data_interm = dict(
-        X_q=proc(X_q),
-        W_q=proc(W_q),
-        b_q=proc(b_q),
-        z_X=proc(z_X),
-        z_W=proc(z_W),
-        z_b=proc(z_b),
-        z_Y=proc(z_Y),
-        sbsY_numerator=proc(sbsY_numerator),
-        sbsY_denominator=proc(sbsY_denominator),
-        sXsWsY_numerator=proc(sXsWsY_numerator),
-        sXsWsY_denominator=proc(sXsWsY_denominator),
-        out=proc(_R_q_simulated),
-        Yt_q=proc(Yt_q_expected),
-        sYsR_numerator=proc(sYsR_numerator),
-        sYsR_denominator=proc(sYsR_denominator),
-        sYtsR_numerator=proc(sYtsR_numerator),
-        sYtsR_denominator=proc(sYtsR_denominator),
-        constant=proc(constant),
-    )
-    """
-
-    data_all = dict(
-        out=proc(int(_Sq_q_simulated)),
-        sR2sSq_numerator=proc(sR2sSq_numerator),
-        sR2sSq_denominator=proc(sR2sSq_denominator),
-        z_R=proc(z_R),
-        z_Sq=proc(z_Sq),
-        Yt_q=proc(Yt_q_expected),
-        sYsR_numerator=proc(sYsR_numerator),
-        sYsR_denominator=proc(sYsR_denominator),
-        sYtsR_numerator=proc(sYtsR_numerator),
-        sYtsR_denominator=proc(sYtsR_denominator),
-        constant=proc(constant),
-        X_q=proc(X_q),
-        W_q=proc(W_q),
-        b_q=proc(b_q),
-        z_X=proc(z_X),
-        z_W=proc(z_W),
-        z_b=proc(z_b),
-        z_Y=proc(z_Y),
-        sbsY_numerator=proc(sbsY_numerator),
-        sbsY_denominator=proc(sbsY_denominator),
-        sXsWsY_numerator=proc(sXsWsY_numerator),
-        sXsWsY_denominator=proc(sXsWsY_denominator),
-    )
-
-    #with open("./artifacts/quantization/inputs_gemm.json", "w") as f:
-    #    json.dump(data_gemm, f, indent=2)
-
-    #with open("./artifacts/quantization/inputs_error.json", "w") as f:
-    #    json.dump(data_error, f, indent=2)
-
-    #with open("./artifacts/quantization/inputs_mse.json", "w") as f:
-    #    json.dump(data_mse, f, indent=2)
-
-    #with open("../../circuits/utils/input.json", "w") as f:
-    #    json.dump(data_all, f, indent=2)
-
-    with open("./artifacts/quantization/inputs_dataset.json", "w") as f:
-        json.dump(data_all, f, indent=2)
-
-    #with open("./artifacts/quantization/inputs_interm.json", "w") as f:
-    #    json.dump(data_interm, f, indent=2)
-
-    #print("diff e ", abs(Y_expected - Y_simulated).mean())
-    #print("diff q ", abs(Y_q_expected - Y_q_simulated).mean())
+    return 
 
 if __name__ == "__main__":
-
-    main()
+    print("oh hey there")

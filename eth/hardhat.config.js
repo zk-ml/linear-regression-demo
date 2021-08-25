@@ -81,7 +81,7 @@ task("list_bounties", "List bounties")
 task("claim_bounty", "Claim bounty")
   .addParam("paymentAddr", "payment address", "0x2546BcD3c84621e976D8185a91A922aE77ECEc30")
   .addParam("publicKey", "bounty issuer's publilckey", "./keys/out_public.json")
-  .addParam("privKey", "private key", "0x47c99abed3324a2707c28affff1267e45918ec8c3f20b8aa892e8b065d2942dd")
+  .addParam("privKey", "private key", "./keys/.private_key")
   .setAction(async (taskArgs) => {
 
     const { execSync } = require("child_process");
@@ -258,9 +258,9 @@ task("claim_bounty", "Claim bounty")
     const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
-    const wallet_raw = new hre.ethers.Wallet(taskArgs.privKey);
+    const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.privKey, 'utf-8'));
     const wallet = wallet_raw.connect(provider);
-    
+
     const write_contract = contract.connect(wallet);
 
     //console.log([arg0, arg1, arg2]);
@@ -299,7 +299,7 @@ task("claim_bounty", "Claim bounty")
 task("add_bounty", "Deposit bounty") 
   .addParam("amount", "amount to add to bounty", "49")
   .addParam("outFile", "file prefix to export private and public key", "out")
-  .addParam("privKey", "private key", "0x47c99abed3324a2707c28affff1267e45918ec8c3f20b8aa892e8b065d2942dd")
+  .addParam("privKey", "private key", "./key/.private_key")
   .setAction(async (taskArgs) => {
 
     const { execSync } = require("child_process");
@@ -410,7 +410,7 @@ task("add_bounty", "Deposit bounty")
     const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
-    const wallet_raw = new hre.ethers.Wallet(taskArgs.privKey);
+    const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.privKey, 'utf-8'));
     
     const wallet = wallet_raw.connect(provider);
 

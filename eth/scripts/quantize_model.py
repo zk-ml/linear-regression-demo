@@ -548,7 +548,130 @@ def q_model(m, p, n,
         sXsWsY_denominator=proc(sXsWsY_denominator),
     )
 
-    with open("./quantized_dataset.json", "w") as f:
+    with open("./quantized_model.json", "w") as f:
+        json.dump(data_all, f, indent=2)
+
+
+def q_dataset(m, p, n, 
+             alpha_X, beta_X,
+             alpha_W, beta_W,
+             alpha_b, beta_b,
+             alpha_Y, beta_Y,
+             alpha_Yt, beta_Yt,
+             alpha_R, beta_R,
+             alpha_S, beta_S,
+             X, Yt_expected, mse):
+
+    # Set random seed for reproducibility
+    random_seed = 0
+    np.random.seed(random_seed)
+
+    # X
+    s_X, z_X = generate_quantization_arb_constants(alpha=alpha_X, beta=beta_X)
+    X_q = quantization_arb(x=X, s=s_X, z=z_X)
+
+    # W
+    s_W, z_W = generate_quantization_arb_constants(alpha=alpha_W, beta=beta_W)
+
+    # b
+    s_b, z_b = generate_quantization_arb_constants(alpha=alpha_b, beta=beta_b)
+
+    # Y
+    s_Y, z_Y = generate_quantization_arb_constants(alpha=alpha_Y, beta=beta_Y)
+
+    # Y_true
+    s_Yt, z_Yt = generate_quantization_arb_constants(alpha=alpha_Yt, beta=beta_Yt)
+    Yt_q_expected = quantization_arb(x=Yt_expected, s=s_Yt, z=z_Yt)
+
+    # Y_res
+    s_R, z_R = generate_quantization_arb_constants(alpha=alpha_R, beta=beta_R)
+    Sq_q_quant = quantization_arb(x=mse, s=s_R, z=z_R)
+    
+    # Squared Error
+    s_Sq, z_Sq = generate_quantization_arb_constants(alpha=alpha_S, beta=beta_S)
+
+    sbsY = Fraction(s_b / s_Y).limit_denominator(LIMIT_DENOM)
+    sXsWsY = Fraction(s_X * s_W / s_Y).limit_denominator(LIMIT_DENOM)
+
+    (
+    sbsY_numerator,
+    sbsY_denominator,
+    sXsWsY_numerator,
+    sXsWsY_denominator,
+    ) = (
+        sbsY.numerator,
+        sbsY.denominator,
+        sXsWsY.numerator,
+        sXsWsY.denominator
+    )
+
+    sYsR = Fraction(s_Y / s_R).limit_denominator(LIMIT_DENOM)
+    sYtsR = Fraction(s_Yt / s_R).limit_denominator(LIMIT_DENOM)
+    constant = z_R - int(z_Y * s_Y / s_R) + int(z_Yt * s_Yt / s_R)
+
+    (
+        sYsR_numerator,
+        sYsR_denominator,
+        sYtsR_numerator,
+        sYtsR_denominator,
+    ) = (
+        sYsR.numerator,
+        sYsR.denominator,
+        sYtsR.numerator,
+        sYtsR.denominator,
+    )
+    
+
+    (
+        Sq_q_simulated,
+        sR2sSq_numerator,
+        sR2sSq_denominator,
+    ) = quantization_mean_squared_error(R_q_simulated, s_R, s_Sq, z_R, z_Sq, m, n)
+
+    def proc(l):
+        import warnings
+
+        def proc_int(x):
+            if x < 0:
+                warnings.warn("Results are negative, circom may not be happy")
+                return P-x
+            return int(x)
+
+        if type(l) is int:
+            return proc_int(l)
+        elif type(l) is float:
+            assert False, "cannot be float"
+        elif type(l[0]) is int:
+            return [proc_int(x) for x in l]
+
+        return [[proc_int(x) for x in j] for j in l]
+
+    data_all = dict(
+        out=proc(Sq_q_quant),
+        sR2sSq_numerator=proc(sR2sSq_numerator),
+        sR2sSq_denominator=proc(sR2sSq_denominator),
+        z_R=proc(z_R),
+        z_Sq=proc(z_Sq),
+        Yt_q=proc(Yt_q_expected),
+        sYsR_numerator=proc(sYsR_numerator),
+        sYsR_denominator=proc(sYsR_denominator),
+        sYtsR_numerator=proc(sYtsR_numerator),
+        sYtsR_denominator=proc(sYtsR_denominator),
+        constant=proc(constant),
+        X_q=proc(X_q),
+        W_q=proc(W_q),
+        b_q=proc(b_q),
+        z_X=proc(z_X),
+        z_W=proc(z_W),
+        z_b=proc(z_b),
+        z_Y=proc(z_Y),
+        sbsY_numerator=proc(sbsY_numerator),
+        sbsY_denominator=proc(sbsY_denominator),
+        sXsWsY_numerator=proc(sXsWsY_numerator),
+        sXsWsY_denominator=proc(sXsWsY_denominator),
+    )
+
+    with open("./quantized_model.json", "w") as f:
         json.dump(data_all, f, indent=2)
 
 

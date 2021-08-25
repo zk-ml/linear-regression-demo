@@ -79,7 +79,7 @@ task("list_bounties", "List bounties")
 
 task("claim_bounty", "Claim bounty")
   .addParam("paymentAddr", "payment address", "0x2546BcD3c84621e976D8185a91A922aE77ECEc30")
-  .addParam("publicKey", "bounty issuer's publilckey", '["6200424876343153377444222516721613071832202193284154667149636560744325857446", "3438276812619573162363877036847828938139883778055244932189209926469640592519"]')
+  .addParam("publicKey", "bounty issuer's publilckey", "./keys/out_public.json")
   .setAction(async (taskArgs) => {
 
     const { execSync } = require("child_process");
@@ -95,7 +95,8 @@ task("claim_bounty", "Claim bounty")
     console.log(Keypair);
 
     const key1 = new Keypair();
-    const pubKey = JSON.parse(taskArgs.publicKey);
+    const pubKey = JSON.parse(fs.readFileSync(taskArgs.publicKey));
+    console.log(pubKey);
     pubKey[0] = BigInt(pubKey[0]);
     pubKey[1] = BigInt(pubKey[1]);
 
@@ -216,7 +217,7 @@ task("claim_bounty", "Claim bounty")
 
     BigInt.prototype.toJSON = function() { return this.toString(16)  }
 
-    fs.writeFile(
+    fs.writeFileSync(
       './artifacts/quantization/inputs.json',
       JSON.stringify(input, null, 2),
       () => {},
@@ -283,6 +284,7 @@ task("claim_bounty", "Claim bounty")
 
 task("add_bounty", "Deposit bounty") 
   .addParam("amount", "amount to add to bounty", "0.01")
+  .addParam("outFile", "file prefix to export private and public key", "out")
   .setAction(async (taskArgs) => {
 
     const { execSync } = require("child_process");
@@ -372,6 +374,20 @@ task("add_bounty", "Deposit bounty")
     console.log(key.pubKey.rawPubKey);
     console.log("Your Private Key: ");
     console.log(key.privKey.rawPrivKey);
+
+    BigInt.prototype.toJSON = function() { return this.toString()  }
+
+    fs.writeFileSync(
+      './keys/'+taskArgs.outFile + '_public.json',
+      JSON.stringify(key.pubKey.rawPubKey, null, 2),
+      () => {},
+    );
+
+    fs.writeFileSync(
+      './keys/'+taskArgs.outFile + '_private.json',
+      JSON.stringify(key.privKey.rawPrivKey, null, 2),
+      () => {},
+    );
 
     const provider = new hre.ethers.providers.JsonRpcProvider();
 

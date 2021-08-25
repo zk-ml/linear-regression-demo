@@ -521,7 +521,9 @@ def q_model(m, p, n,
     #print("Mean Error actual: ", Mr)
     #print("Mean Error simulated: ", Mr_simulated)
     print("Mean Squared Error actual: ", Sq)
+    print("quantized ", Sq_q)
     print("Mean Squared Error simulated: ", Sq_simulated)
+    print("quantized ", quantization_arb(x=Sq_simulated, s=s_Sq, z=z_Sq))
 
     data_all = dict(
         out=proc(int(_Sq_q_simulated)),
@@ -585,10 +587,10 @@ def q_dataset(
 
     # Y_res
     s_R, z_R = generate_quantization_arb_constants(alpha=alpha_R, beta=beta_R)
-    Sq_q_quant = quantization_arb(x=mse, s=s_R, z=z_R)
 
     # Squared Error
     s_Sq, z_Sq = generate_quantization_arb_constants(alpha=alpha_S, beta=beta_S)
+    Sq_q_quant = quantization_arb(x=mse, s=s_Sq, z=z_Sq)
 
     sbsY = Fraction(s_b / s_Y).limit_denominator(LIMIT_DENOM)
     sXsWsY = Fraction(s_X * s_W / s_Y).limit_denominator(LIMIT_DENOM)

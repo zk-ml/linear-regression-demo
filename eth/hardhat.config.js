@@ -9,7 +9,7 @@ require("@nomiclabs/hardhat-web3");
 require("maci-domainobjs");
 require("maci-crypto");
 
-const CONTRACT_ADDRESS = "0xF8e31cb472bc70500f08Cd84917E5A1912Ec8397";
+const CONTRACT_ADDRESS = "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -35,8 +35,8 @@ task("list_bounties", "List bounties")
   .setAction(async (taskArgs) => {
     const fs = require("fs");
     const provider = new ethers.providers.JsonRpcProvider();
-    const contract_interface = JSON.parse(fs.readFileSync("artifacts/contracts/libraries/BountyManager.sol/BountyManager.json")).abi;
-    var contract = new hre.ethers.Contract(CONTRACT_ADDRESS, contract_interface, provider);
+    const BountyManager = await hre.ethers.getContractFactory('BountyManager');
+    const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
     wallet = await hre.ethers.getSigner();
 
@@ -56,8 +56,8 @@ task("list_bounties", "List bounties")
   .setAction(async (taskArgs) => {
     const fs = require("fs");
     const provider = new ethers.providers.JsonRpcProvider();
-    const contract_interface = JSON.parse(fs.readFileSync("artifacts/contracts/libraries/BountyManager.sol/BountyManager.json")).abi;
-    var contract = new hre.ethers.Contract(CONTRACT_ADDRESS, contract_interface, provider);
+    const BountyManager = await hre.ethers.getContractFactory('BountyManager');
+    const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
     wallet = await hre.ethers.getSigner();
 
@@ -251,8 +251,8 @@ task("claim_bounty", "Claim bounty")
 
 
     const provider = new ethers.providers.JsonRpcProvider();
-    const contract_interface = JSON.parse(fs.readFileSync("artifacts/contracts/libraries/BountyManager.sol/BountyManager.json")).abi;
-    var contract = new hre.ethers.Contract(CONTRACT_ADDRESS, contract_interface, provider);
+    const BountyManager = await hre.ethers.getContractFactory('BountyManager');
+    const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
     wallet = await hre.ethers.getSigner();
 
@@ -374,8 +374,9 @@ task("add_bounty", "Deposit bounty")
     console.log(key.privKey.rawPrivKey);
 
     const provider = new ethers.providers.JsonRpcProvider();
-    const contract_interface = JSON.parse(fs.readFileSync("artifacts/contracts/libraries/BountyManager.sol/BountyManager.json")).abi;
-    var contract = new hre.ethers.Contract(CONTRACT_ADDRESS, contract_interface, provider);
+
+    const BountyManager = await hre.ethers.getContractFactory('BountyManager');
+    const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
     wallet = await hre.ethers.getSigner();
 

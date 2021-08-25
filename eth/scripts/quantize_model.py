@@ -337,6 +337,221 @@ def quant_matmul_circuit(
 
     return mult
 
+def quantize(m, p, n, 
+             alpha_X, beta_X,
+             alpha_W, beta_W,
+             alpha_b, beta_b,
+             alpha_Y, beta_Y,
+             alpha_Yt, beta_Yt,
+             alpha_R, beta_R,
+             alpha_S, beta_S,
+             X, W, b, Yt_expected):
+
+    # Set random seed for reproducibility
+    random_seed = 0
+    np.random.seed(random_seed)
+
+    # X
+    s_X, z_X = generate_quantization_arb_constants(alpha=alpha_X, beta=beta_X)
+    X_q = quantization_arb(x=X, s=s_X, z=z_X)
+
+    # W
+    s_W, z_W = generate_quantization_arb_constants(alpha=alpha_W, beta=beta_W)
+    W_q = quantization_arb(x=W, s=s_W, z=z_W)
+
+    # b
+    s_b, z_b = generate_quantization_arb_constants(alpha=alpha_b, beta=beta_b)
+    b_q = quantization_arb(x=b, s=s_b, z=z_b)
+
+    # Y
+    s_Y, z_Y = generate_quantization_arb_constants(alpha=alpha_Y, beta=beta_Y)
+    Y_expected = np.matmul(X, W) + b
+    Y_q_expected = quantization_arb(x=Y_expected, s=s_Y, z=z_Y)
+
+    # Y_true
+    s_Yt, z_Yt = generate_quantization_arb_constants(alpha=alpha_Yt, beta=beta_Yt)
+    Yt_q_expected = quantization_arb(x=Yt_expected, s=s_Yt, z=z_Yt)
+
+    # Y_res
+    s_R, z_R = generate_quantization_arb_constants(alpha=alpha_R, beta=beta_R)
+
+    # Squared Error
+    s_Sq, z_Sq = generate_quantization_arb_constants(alpha=alpha_S, beta=beta_S)
+
+    R = Y_expected - Yt_expected
+    Mr = R.mean()
+    Sq = (R ** 2).mean()
+
+    Sq_q = quantization_arb(x=Sq, s=s_Sq, z=z_Sq)
+    R_q = quantization_arb(x=R, s=s_R, z=z_R)
+    Mr_q = quantization_arb(x=Mr, s=s_R, z=z_R)
+
+    (
+        Y_q_simulated,
+        sbsY_numerator,
+        sbsY_denominator,
+        sXsWsY_numerator,
+        sXsWsY_denominator,
+        p,
+    ) = quantization_matrix_multiplication_arb(
+        X_q=X_q,
+        W_q=W_q,
+        b_q=b_q,
+        s_X=s_X,
+        z_X=z_X,
+        s_W=s_W,
+        z_W=z_W,
+        s_b=s_b,
+        z_b=z_b,
+        s_Y=s_Y,
+        z_Y=z_Y,
+    )
+
+    # Sanity Check
+    _Y_q_simulated = quant_matmul_circuit(
+        X_q=X_q,
+        W_q=W_q,
+        b_q=b_q,
+        z_X=z_X,
+        z_W=z_W,
+        z_b=z_b,
+        z_Y=z_Y,
+        m=m,
+        n=n,
+        p=p,
+        sbsY_numerator=sbsY_numerator,
+        sbsY_denominator=sbsY_denominator,
+        sXsWsY_numerator=sXsWsY_numerator,
+        sXsWsY_denominator=sXsWsY_denominator,
+    )
+    assert (Y_q_simulated == _Y_q_simulated).all()
+    print("gemm assertion passed")
+    #print("_Y_q_simulated", _Y_q_simulated)
+
+    (
+        R_q_simulated,
+        sYsR_numerator,
+        sYsR_denominator,
+        sYtsR_numerator,
+        sYtsR_denominator,
+        constant,
+    ) = quantization_error(
+        Y_q=Y_q_simulated,
+        Yt_q=Yt_q_expected,
+        s_R=s_R,
+        z_R=z_R,
+        s_Y=s_Y,
+        z_Y=z_Y,
+        s_Yt=s_Yt,
+        z_Yt=z_Yt,
+    )
+
+    _R_q_simulated = quant_error_circuit(
+        Y_q=Y_q_simulated,
+        Yt_q=Yt_q_expected,
+        s_R=s_R,
+        z_R=z_R,
+        s_Y=s_Y,
+        z_Y=z_Y,
+        s_Yt=s_Yt,
+        z_Yt=z_Yt,
+        m=m,
+        n=n,
+    )
+
+    assert (_R_q_simulated == R_q_simulated).all()
+    print("error assertion passed")
+    (
+        Sq_q_simulated,
+        sR2sSq_numerator,
+        sR2sSq_denominator,
+    ) = quantization_mean_squared_error(R_q_simulated, s_R, s_Sq, z_R, z_Sq, m, n)
+
+    Mr_q_simulated = quantization_mean_error(
+        Y_q=Y_q_simulated,
+        Yt_q=Yt_q_expected,
+        s_R=s_R,
+        z_R=z_R,
+        s_Y=s_Y,
+        z_Y=z_Y,
+        s_Yt=s_Yt,
+        z_Yt=z_Yt,
+        m=m,
+    )
+
+    _Sq_q_simulated = quant_mse(R_q_simulated, s_R, s_Sq, z_R, z_Sq, m, n)
+
+    assert (_Sq_q_simulated == Sq_q_simulated).all(), (_Sq_q_simulated, Sq_q_simulated)
+    print("mse assertion passed")
+
+    Mr_simulated = dequantization(Mr_q_simulated, s=s_R, z=z_R)
+    Sq_simulated = dequantization(Sq_q_simulated, s=s_Sq, z=z_Sq)
+    Y_simulated = dequantization(x_q=Y_q_simulated, s=s_Y, z=z_Y)
+
+    #print("Args")
+    #print(sbsY_numerator, sbsY_denominator, sXsWsY_numerator, sXsWsY_denominator)
+    #print(sYsR_numerator, sYsR_denominator, sYtsR_numerator, sYtsR_denominator)
+    #print(sR2sSq_numerator, sR2sSq_denominator)
+
+    #print("Sq actual ", Sq_q.T)
+    #print("Sq computed ", Sq_q_simulated.T)
+    #print("R_q actual ", R_q.T)
+    #print("R_q computed ", R_q_simulated.T)
+    #print("R_q diff ", R_q.T - R_q_simulated.T)
+    #print("Mr_q actual ", Mr_q)
+    #print("Mr_q computed ", Mr_q_simulated)
+    #print("Mean Error actual: ", Mr)
+    #print("Mean Error simulated: ", Mr_simulated)
+    print("Mean Squared Error actual: ", Sq)
+    print("Mean Squared Error simulated: ", Sq_simulated)
+
+    def proc(l):
+        import warnings
+
+        def proc_int(x):
+            if x < 0:
+                warnings.warn("Results are negative, circom may not be happy")
+                return P-x
+            return int(x)
+
+        if type(l) is int:
+            return proc_int(l)
+        elif type(l) is float:
+            assert False, "cannot be float"
+        elif type(l[0]) is int:
+            return [proc_int(x) for x in l]
+
+        return [[proc_int(x) for x in j] for j in l]
+
+    data_all = dict(
+        out=proc(int(_Sq_q_simulated)),
+        sR2sSq_numerator=proc(sR2sSq_numerator),
+        sR2sSq_denominator=proc(sR2sSq_denominator),
+        z_R=proc(z_R),
+        z_Sq=proc(z_Sq),
+        Yt_q=proc(Yt_q_expected),
+        sYsR_numerator=proc(sYsR_numerator),
+        sYsR_denominator=proc(sYsR_denominator),
+        sYtsR_numerator=proc(sYtsR_numerator),
+        sYtsR_denominator=proc(sYtsR_denominator),
+        constant=proc(constant),
+        X_q=proc(X_q),
+        W_q=proc(W_q),
+        b_q=proc(b_q),
+        z_X=proc(z_X),
+        z_W=proc(z_W),
+        z_b=proc(z_b),
+        z_Y=proc(z_Y),
+        sbsY_numerator=proc(sbsY_numerator),
+        sbsY_denominator=proc(sbsY_denominator),
+        sXsWsY_numerator=proc(sXsWsY_numerator),
+        sXsWsY_denominator=proc(sXsWsY_denominator),
+    )
+
+    with open("./quantized_dataset.json", "w") as f:
+        json.dump(data_all, f, indent=2)
+
+
 
 def main():
 

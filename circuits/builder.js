@@ -86,8 +86,8 @@ async function run() {
       );
     //console.log(call_data);
 
-    const verified = await snarkjs.groth16.verify(verification_key, publicSignals, proof, logger);
-    if (!verified) throw new Error("Could not verify the proof");
+    //const verified = await snarkjs.groth16.verify(verification_key, publicSignals, proof, logger);
+    //if (!verified) throw new Error("Could not verify the proof");
 
     if (process.argv.length !== 3) {
       const templates = {};

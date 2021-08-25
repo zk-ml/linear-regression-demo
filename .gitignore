@@ -4,3 +4,4 @@ yarn-error.log
 .vscode/settings.json
 *.swp
 eth/.ipynb_checkpoints/demo-checkpoint.ipynb
+cli/src/Circuits/lr/lr.zkey

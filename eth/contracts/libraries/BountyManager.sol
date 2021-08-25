@@ -42,9 +42,10 @@ contract BountyManager is Verifier {
   function remove(uint256 value) public {
       uint256 index = indexOf[value];
 
-      if (index == 0) {
-        return;
-      }
+      //if (index == 0) {
+      //  return;
+      //}
+      require(index > 0, "index = 0, remove dataset");
 
       // move the last item into the index being vacated
       uint256 lastValue = list_bounties[length_list_bounties - 1];
@@ -69,9 +70,10 @@ contract BountyManager is Verifier {
   function remove_bounty(uint256 dataset_hash, uint256[3] memory value) public {
       uint256 index = bountyIndexOf[value[0]][value[1]][value[2]];
 
-      if (index == 0) {
-        return;
-      }
+      //if (index == 0) {
+      //  return;
+      //}
+      require(index > 0, "index = 0, remove bounty");
 
       // move the last item into the index being vacated
       KeysPerf storage lastValue = public_keys[dataset_hash][length[dataset_hash] - 1];

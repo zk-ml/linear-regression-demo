@@ -94,33 +94,25 @@ task("claim_bounty", "Claim bounty")
 
     const { Keypair } = require('maci-domainobjs');
     const mimc7 = require('./node_modules/circomlib/src/mimc7.js');
-    console.log(Keypair);
+    //console.log(Keypair);
 
     const key = new Keypair();
     const pubKey = JSON.parse(fs.readFileSync(taskArgs.publicKey));
-    console.log(pubKey);
+    //console.log(pubKey);
     pubKey[0] = BigInt(pubKey[0]);
     pubKey[1] = BigInt(pubKey[1]);
 
-    
-    /*
-    [
-      BigInt("12394963504092133463590298742771255746910402294421902681602275178368694525156"),
-      BigInt("2810009863761268199375234926728016029541833696552145042968279544829897552560"),
-    ];
-    */
-
     const key2 = new Keypair();
-    console.log('---------');
+    //console.log('---------');
     key2.pubKey.rawPubKey = pubKey;
-    console.log(pubKey);
-    console.log(key2.pubKey.rawPubKey);
+    //console.log(pubKey);
+    //console.log(key2.pubKey.rawPubKey);
 
     const sharedKey = Keypair.genEcdhSharedKey(key.privKey, key2.pubKey);
 
     const rawdata = fs.readFileSync('./artifacts/quantization/inputs_ml.json');
     const data = JSON.parse(rawdata);
-    console.log(data);
+    //console.log(data);
 
     function tobigint(value) {
       return BigInt(value);
@@ -207,7 +199,7 @@ task("claim_bounty", "Claim bounty")
         W_q_enc[i][j] = [val1, W_q_enc[i][j]+val2];
       }
     }
-    console.log(b_q_enc);
+    //console.log(b_q_enc);
     //console.log(W_q_enc);
 
     const _input = {
@@ -271,10 +263,10 @@ task("claim_bounty", "Claim bounty")
     
     //arg3[0] = "133";
 
-    const index_offset = m * p + n * p * 2 + n * 2;
-    console.log(key2.pubKey);
-    console.log(arg3[index_offset+2]);
-    console.log(arg3[index_offset+3]);
+    //const index_offset = m * p + n * p * 2 + n * 2;
+    //console.log(key2.pubKey);
+    //console.log(arg3[index_offset+2]);
+    //console.log(arg3[index_offset+3]);
     //console.log(arg3[index_offset+2]);
     //console.log(arg0, arg1, arg2, arg3);
 
@@ -289,7 +281,7 @@ task("claim_bounty", "Claim bounty")
     console.log(key.pubKey.rawPubKey);
     console.log("Your Private Key: ");
     console.log(key.privKey.rawPrivKey);
-    console.log("Success!");
+    //console.log("Success!");
 
     balance = await provider.getBalance(taskArgs.paymentAddr);
     console.log("Current Balance");

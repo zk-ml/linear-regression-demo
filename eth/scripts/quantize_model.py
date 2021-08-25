@@ -345,7 +345,7 @@ def main():
     np.random.seed(random_seed)
 
     # Random matrices
-    m = 50 # Sample Size
+    m = 20 # Sample Size
     p = 4  # Feature Dim
     n = 1  # Should be 1 for LR
 
@@ -634,6 +634,9 @@ def main():
 
     #with open("./artifacts/quantization/inputs_mse.json", "w") as f:
     #    json.dump(data_mse, f, indent=2)
+
+    #with open("../../circuits/utils/input.json", "w") as f:
+    #    json.dump(data_all, f, indent=2)
 
     with open("./artifacts/quantization/inputs_dataset.json", "w") as f:
         json.dump(data_all, f, indent=2)

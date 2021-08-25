@@ -121,8 +121,8 @@ task("claim_bounty", "Claim bounty")
     }
 
     var to_hash = [];
-    var m = 1;
-    var p = 10;
+    var m = 20;
+    var p = 4;
     var n = 1;
 
     var idx = 0;
@@ -313,15 +313,15 @@ task("add_bounty", "Deposit bounty")
 
     const rawdata = fs.readFileSync('./artifacts/quantization/inputs_dataset.json');
     const data = JSON.parse(rawdata);
-    //console.log(data);
+    console.log(data);
 
     function tobigint(value) {
       return BigInt(value);
     }
 
     var to_hash = [];
-    var m = 1;
-    var p = 10;
+    var m = 20;
+    var p = 4;
     var n = 1;
 
     var idx = 0;

@@ -244,8 +244,6 @@ task("claim_bounty", "Claim bounty")
     const verified = await snarkjs.groth16.verify(verification_key, publicSignals, proof, logger);
     if (!verified) throw new Error("Could not verify the proof");
 
-    function convert(x) {return '0x'+BigInt(x).toString(16);}
-
     arg0 = [proof.pi_a[0], proof.pi_a[1]];
     arg1 = [[proof.pi_b[0][1], proof.pi_b[0][0]], [proof.pi_b[1][1], proof.pi_b[1][0]]]
     arg2 = [proof.pi_c[0], proof.pi_c[1]];
@@ -260,7 +258,7 @@ task("claim_bounty", "Claim bounty")
 
     const write_contract = contract.connect(wallet);
 
-    console.log([arg0, arg1, arg2]);
+    //console.log([arg0, arg1, arg2]);
     console.log("Paying " + taskArgs.paymentAddr);
     console.log("With balance");
     balance = await provider.getBalance(taskArgs.paymentAddr);
@@ -269,6 +267,7 @@ task("claim_bounty", "Claim bounty")
     //arg3[0] = "133";
 
     const index_offset = m * p + n * p * 2 + n * 2;
+    console.log(key2.pubKey);
     console.log(arg3[index_offset]);
     console.log(arg3[index_offset+1]);
     //console.log(arg3[index_offset+2]);

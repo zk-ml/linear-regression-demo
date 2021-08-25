@@ -4,7 +4,6 @@ import sys
 from fractions import Fraction
 
 import numpy as np
-import pandas as pd
 import json
 
 P = 21888242871839275222246405745257275088548364400416034343698204186575808495617
@@ -753,13 +752,13 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode")
-    parser.add_argument("--setting")
+    parser.add_argument("--settings")
     parser.add_argument("--model")
     args = parser.parse_args()
 
     if args.mode == "model":
-        quant_model(args.model, args.setting)
+        quant_model(args.model, args.settings)
     elif args.mode == "dataset":
-        quant_dataset(args.model, args.setting)
+        quant_dataset(args.model, args.settings)
     else:
         assert False

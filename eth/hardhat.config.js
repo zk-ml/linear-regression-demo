@@ -82,13 +82,15 @@ task("claim_bounty", "Claim bounty")
   .addParam("paymentAddr", "payment address", "0x2546BcD3c84621e976D8185a91A922aE77ECEc30")
   .addParam("publicKey", "bounty issuer's publilckey", "./keys/out_public.json")
   .addParam("privKey", "private key", "./keys/.private_key")
+  .addParam("model", "model", "./model")
+  .addParam("settings", "settings", "settings.json")
   .setAction(async (taskArgs) => {
 
     const { execSync } = require("child_process");
     const fs = require("fs");
     const snarkjs = require("snarkjs");
 
-    execSync("python3 scripts/quantize_model.py", {
+    execSync("python3 scripts/quantize.py --mode model --settings "+ taskArgs.settings + " --model " + taskArgs.model, {
       stdio: "inherit",
     });
 
@@ -292,12 +294,14 @@ task("add_bounty", "Deposit bounty")
   .addParam("amount", "amount to add to bounty", "49")
   .addParam("outFile", "file prefix to export private and public key", "out")
   .addParam("privKey", "private key", "./keys/.private_key")
+  .addParam("model", "model", "./model")
+  .addParam("settings", "settings", "settings.json")
   .setAction(async (taskArgs) => {
 
     const { execSync } = require("child_process");
     const fs = require("fs");
 
-    execSync("python3 scripts/quantize_dataset.py", {
+    execSync("python3 scripts/quantize.py --mode dataset --settings "+ taskArgs.settings + " --model " + taskArgs.model, {
       stdio: "inherit",
     });
 

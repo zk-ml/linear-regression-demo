@@ -33,7 +33,6 @@ task("list_bounties", "List bounties")
   .addParam("hash", "Dataset hash", "15681440893605958136105542719628389980032562080249509287477198087707031153419")
   .setAction(async (taskArgs) => {
     const fs = require("fs");
-    const provider = new hre.ethers.providers.JsonRpcProvider();
     const BountyManager = await hre.ethers.getContractFactory('BountyManager');
     const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);

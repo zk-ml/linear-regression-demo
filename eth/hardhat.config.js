@@ -66,7 +66,7 @@ task("list_bounties", "List bounties")
 
     tx = await write_contract.query_datasets();
     
-    const hashes = tx.map(function (x) { return x.toString(16) });
+    const hashes = tx.map(function (x) { return x.toString() });
     const aliases = await Promise.all(tx.map(async function (hash) {
       var alias = await write_contract.get_alias(hash);
       return alias;
@@ -228,12 +228,13 @@ task("claim_bounty", "Claim bounty")
 
     const logger = {
         debug: () => { },
-        info: console.log,
-        warn: console.log,
-        error: console.log,
+        info: (x) => { console.log('INFO: ' + x) },
+        warn: (x) => { console.log('WARN: ' + x) },
+        error: (x) => { console.log('ERROR: ' + x) },
     };
 
     const verification_key = await snarkjs.zKey.exportVerificationKey(final_zkey);
+    console.log('Running Circuit ...');
     await snarkjs.wtns.calculate(input, wasm, wtns, logger);
     const start = Date.now();
     const { proof, publicSignals } = await snarkjs.groth16.prove(final_zkey, wtns, logger);

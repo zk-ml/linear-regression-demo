@@ -126,10 +126,32 @@ contract BountyManager is Verifier {
       _add_to_bounty_list(dataset_hash, [public_key[0], public_key[1], mse_cap]);
     }
     perAddressBounty[dataset_hash][public_key[0]][public_key[1]][mse_cap][msg.sender] = msg.value;
-    perAddressBounty_keys[dataset_hash][public_key[0]][public_key[1]][mse_cap].push(msg.sender);
+    bool exists = false;
+    uint256 len = perAddressBounty_keys[dataset_hash][public_key[0]][public_key[1]][mse_cap].length;
+    for (uint256 i = 0; i < len; i++) {
+      if (perAddressBounty_keys[dataset_hash][public_key[0]][public_key[1]][mse_cap][i] == msg.sender) {
+        exists = true;
+      }
+    }
+    if (!exists) {
+      perAddressBounty_keys[dataset_hash][public_key[0]][public_key[1]][mse_cap].push(msg.sender);
+    }
     dataset_alias[dataset_hash] = alias_dataset;
     bounties[dataset_hash][public_key[0]][public_key[1]][mse_cap] += msg.value;
     emit BountyDeposited(msg.value);
+  }
+
+  function removeBounty(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) public {
+    uint256 toremove = perAddressBounty[dataset_hash][public_key[0]][public_key[1]][mse_cap][msg.sender];
+    bounties[dataset_hash][public_key[0]][public_key[1]][mse_cap] -= toremove;
+    perAddressBounty[dataset_hash][public_key[0]][public_key[1]][mse_cap][msg.sender] = 0;
+    uint256 len = perAddressBounty_keys[dataset_hash][public_key[0]][public_key[1]][mse_cap].length;
+    for (uint256 i = 0; i < len; i++) {
+      if (perAddressBounty_keys[dataset_hash][public_key[0]][public_key[1]][mse_cap][i] == msg.sender) {
+        perAddressBounty_keys[dataset_hash][public_key[0]][public_key[1]][mse_cap][i] = perAddressBounty_keys[dataset_hash][public_key[0]][public_key[1]][mse_cap][len-1];
+        perAddressBounty_keys[dataset_hash][public_key[0]][public_key[1]][mse_cap].pop();
+      }
+    }
   }
 
   function collectBounty(
@@ -154,8 +176,10 @@ contract BountyManager is Verifier {
       bounties[dataset_hash][public_key_0][public_key_1][mse_cap] = 0;
 
       address[] storage addrs = perAddressBounty_keys[dataset_hash][public_key_0][public_key_1][mse_cap];
-      for (uint256 i = 0; i < addrs.length; i++) {
+      uint256 len = addrs.length;
+      for (uint256 i = 0; i < len; i++) {
         perAddressBounty[dataset_hash][public_key_0][public_key_1][mse_cap][msg.sender] = 0;
+        perAddressBounty_keys[dataset_hash][public_key_0][public_key_1][mse_cap].pop();
       }
       to.transfer(topay);
       emit BountyCollected(topay);

@@ -161,10 +161,9 @@ contract BountyManager is Verifier {
       }
     }
 
-    address refund_account = msg.sender;
+    address payable refund_account = msg.sender;
     refund_account.transfer(toremove);
     emit BountyRemoved(toremove);
-    return toremove;
   }
 
   function collectBounty(
@@ -173,7 +172,7 @@ contract BountyManager is Verifier {
           uint[2][2] memory b,
           uint[2] memory c,
           uint[131] memory input
-      ) public returns (uint256) {
+      ) public {
       require(verifyProof(a, b, c, input), "Invalid Proof");
       
       uint index_offset = m * p + n * p * 2 + n * 2;
@@ -196,7 +195,6 @@ contract BountyManager is Verifier {
       }
       to.transfer(topay);
       emit BountyCollected(topay);
-      return topay;
   }
 
   // Function to receive Ether. msg.data must be empty

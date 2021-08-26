@@ -33,7 +33,7 @@ async function main() {
   wallet = await hre.ethers.getSigner();
 
   // Querying the network
-  console.log(await wallet.getBalance());
+  //console.log(await wallet.getBalance());
 
   res = await wallet.sendTransaction(tx);
 
@@ -47,8 +47,8 @@ async function main() {
     () => {},
   );
 
-  console.log(await provider.getBalance(bm.address));
-  console.log(await provider.getTransactionCount(bm.address));
+  console.log("Ether Balance: " + ethers.utils.formatEther(await provider.getBalance(bm.address)));
+  console.log("Transaction Count: " + await provider.getTransactionCount(bm.address));
 }
 
 // We recommend this pattern to be able to use async/await everywhere

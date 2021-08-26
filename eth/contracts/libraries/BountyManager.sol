@@ -85,15 +85,17 @@ contract BountyManager is Verifier {
       bountyIndexOf[value[0]][value[1]][value[2]] = 0;
   }
 
-  //event AvailableBounties(uint[] mse_caps, uint[] public_keys_1, uint[] public_keys_2);
-
   constructor(uint mi, uint pi, uint ni) public payable {
     m = mi;
     p = pi;
     n = ni;
   }
 
-  function bounty_contributors(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) public view returns (address[] memory) {
+  function query_bounty_contribution(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap, address addr) public view returns (address[] memory) {
+    return perAddressBounty[dataset_hash][public_key[0]][public_key[1]][mse_cap][addr];
+  }
+
+  function query_bounty_contributors(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) public view returns (address[] memory) {
     return perAddressBounty_keys[dataset_hash][public_key[0]][public_key[1]][mse_cap];
   }
 
@@ -103,7 +105,6 @@ contract BountyManager is Verifier {
 
   function query_bounties(uint256 dataset_hash) public view returns (KeysPerf[] memory) {
     return public_keys[dataset_hash];
-    //emit AvailableBounties(mse_caps, pbkeys_1, pbkeys_2);
   }
 
   function query_num_datasets() public view returns (uint256) {

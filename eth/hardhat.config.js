@@ -47,7 +47,13 @@ task("list_bounties", "List bounties given dataset")
     hashes = await write_contract.queryDatasetBounties(taskArgs.hash);
     const bounties = await Promise.all(hashes.map(async function (hash) { 
       x = await write_contract.queryBountyHash(hash);
-      return {"publickey-1": x[0].toString(), "publickey-2": x[1].toString(), "MSE-Cap":  x[2].toString()}; 
+      return {"PubKey1": x[1].toString(),
+              "PubKey2": x[2].toString(),
+              "MSEcap":  x[3].toString(),
+              "Bounty": ethers.utils.formatEther(x[4]).toString(),
+              "Issuer": x[5].toString(),
+              "Note": x[6].toString(),
+             }; 
     }));
     console.log(bounties);  
   });

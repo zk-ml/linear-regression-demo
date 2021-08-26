@@ -101,6 +101,10 @@ contract BountyManager is Verifier {
     //emit AvailableBounties(mse_caps, pbkeys_1, pbkeys_2);
   }
 
+  function query_num_datasets() public view returns (uint256) {
+    return length_list_bounties;
+  }
+
   function query_datasets() public view returns (uint256[] memory) {
     return list_bounties;
   }

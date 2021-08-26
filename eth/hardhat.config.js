@@ -64,10 +64,10 @@ task("list_bounties", "List bounties")
     wallet = await hre.ethers.getSigner();
 
     const write_contract = contract.connect(wallet);
-
     tx = await write_contract.query_datasets();
+    num_datasets = await write_contract.query_num_datasets();
     
-    const hashes = tx.map(function (x) { return x.toString() });
+    const hashes = tx.slice(0, num_datasets).map(function (x) { return x.toString() });
     const aliases = await Promise.all(tx.map(async function (hash) {
       var alias = await write_contract.get_alias(hash);
       return alias;

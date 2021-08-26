@@ -364,7 +364,7 @@ def q_model(m, p, n,
              alpha_Yt, beta_Yt,
              alpha_R, beta_R,
              alpha_S, beta_S,
-             X, W, b, Yt_expected):
+             X, W, b, Yt_expected, mse):
 
     # Set random seed for reproducibility
     random_seed = 0
@@ -526,8 +526,11 @@ def q_model(m, p, n,
     print("Mean Squared Error simulated: ", Sq_simulated)
     print("... quantized ", quantization_arb(x=Sq_simulated, s=s_Sq, z=z_Sq))
 
+    Sq_q_quant = quantization_arb(x=mse, s=s_Sq, z=z_Sq)
+
     data_all = dict(
-        out=proc(int(_Sq_q_simulated)),
+        #out=proc(int(_Sq_q_simulated)),
+        out=proc(int(Sq_q_quant)),
         sR2sSq_numerator=proc(sR2sSq_numerator),
         sR2sSq_denominator=proc(sR2sSq_denominator),
         z_R=proc(z_R),
@@ -731,6 +734,8 @@ def quant_model(model, setting):
     alpha_S = data['alpha_S']
     beta_S = data['beta_S']
 
+    mse_target = data['mse_target']
+
     X = np.load(f'{model}/X.npy')
     W = np.load(f'{model}/W.npy')
     b = np.load(f'{model}/b.npy')
@@ -744,7 +749,7 @@ def quant_model(model, setting):
          alpha_Yt, beta_Yt,
          alpha_R, beta_R,
          alpha_S, beta_S,
-         X, W, b, Y)
+         X, W, b, Y, mse_target)
 
     return 
 

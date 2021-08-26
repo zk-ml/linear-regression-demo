@@ -124,6 +124,7 @@ task("remove_bounty", "Remove bounty without claiming")
   .addParam("walletprivatekey", "wallet private key", "./keys/.private_key")
   .addParam("mse", "mse cap, quantized", "18406")
   .setAction(async (taskArgs) => {
+    const provider = new hre.ethers.providers.JsonRpcProvider();
     const fs = require("fs");
     const BountyManager = await hre.ethers.getContractFactory('BountyManager');
     const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');

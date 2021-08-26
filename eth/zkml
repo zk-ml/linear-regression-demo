@@ -1,1 +1,2 @@
-npx hardhat --network localhost
+#!/bin/zsh
+npx hardhat --network localhost "$@"

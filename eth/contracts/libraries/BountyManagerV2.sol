@@ -44,7 +44,7 @@ contract BountyManagerV2 is Verifier {
   function add_bounty_to_datasets(uint256 dataset_hash, bytes32 h) private {
     if (dataset_to_bounties_idx[dataset_hash][h] == 0) {
         dataset_to_bounties[dataset_hash].push(h);
-        dataset_to_bounties_idx[dataset_hash][h] = dataset_to_bounties[dataset_hash].length + 1;
+        dataset_to_bounties_idx[dataset_hash][h] = dataset_to_bounties[dataset_hash].length;
     }
   }
 
@@ -60,7 +60,7 @@ contract BountyManagerV2 is Verifier {
   function add_to_datasets(uint256 dataset_hash) private {
     if (dataset_idx[dataset_hash] == 0) {
         datasets.push(dataset_hash);
-        dataset_idx[dataset_hash] = datasets.length + 1;
+        dataset_idx[dataset_hash] = datasets.length;
     }
   }
 

@@ -67,19 +67,11 @@ task("list_bounties", "List bounties given dataset")
     const wallet = wallet_raw.connect(provider);
 
     const write_contract = contract.connect(wallet);
-    tx = await write_contract.query_datasets();
-    num_datasets = await write_contract.query_num_datasets();
-    tx = tx.slice(0, num_datasets);
+    tx = await write_contract.getDatasets();
     const hashes = tx.map(function (x) { return x.toString() });
-    const aliases = await Promise.all(tx.map(async function (hash) {
-      var alias = await write_contract.get_alias(hash);
-      return alias;
-    }));
     
-    const zip = (a, b) => a.map((k, i) => [k, b[i]]);
-
     console.log("Available datasets:");
-    console.log(zip(aliases, hashes));
+    console.log(hashes);
   });
 
 task("list_bounty_contributors", "List bounty contributor addresses, given dataset") 

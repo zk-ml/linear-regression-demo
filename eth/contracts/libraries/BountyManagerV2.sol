@@ -72,6 +72,10 @@ contract BountyManagerV2 is Verifier {
     dataset_idx[dataset_hash] = 0;
   }
 
+  function getDatasets() public view returns (uint256[] memory) {
+    return datasets;
+  }
+
   function queryBounty(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) public view returns (Bounty memory) {
     return bounties[hashBounty(dataset_hash, public_key, mse_cap)];
   }

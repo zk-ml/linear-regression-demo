@@ -93,7 +93,7 @@ contract BountyManager is Verifier {
   }
 
   function query_num_bounties(uint256 dataset_hash) public view returns (uint256) {
-    return public_keys[dataset_hash].length;
+    return length[dataset_hash];
   }
 
   function query_bounties(uint256 dataset_hash) public view returns (KeysPerf[] memory) {

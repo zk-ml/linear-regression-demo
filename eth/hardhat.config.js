@@ -30,7 +30,7 @@ task("balance", "Prints an account's balance")
   });
 
 task("list_bounties", "List bounties")
-  .addParam("datasetHash", "Dataset hash", "15681440893605958136105542719628389980032562080249509287477198087707031153419")
+  .addParam("hash", "Dataset hash", "15681440893605958136105542719628389980032562080249509287477198087707031153419")
   .setAction(async (taskArgs) => {
     const fs = require("fs");
     const provider = new hre.ethers.providers.JsonRpcProvider();
@@ -42,11 +42,12 @@ task("list_bounties", "List bounties")
 
     const write_contract = contract.connect(wallet);
 
-    var alias = await write_contract.get_alias(taskArgs.datasetHash);
+    var alias = await write_contract.get_alias(taskArgs.hash);
 
     console.log("Available bounties on dataset: " + alias);
-    tx = await write_contract.query_bounties(taskArgs.datasetHash);
-    const bounties = tx.map(function (x) { 
+    tx = await write_contract.query_bounties(taskArgs.hash);
+    num_bounties = await write_contract.query_num_bounties(taskArgs.hash);
+    const bounties = tx.slice(0, num_bounties).map(function (x) { 
       return {"PublicKey-1": x[0].toString(), "PublicKey-2": x[1].toString(), "MSE-Cap":  x[2].toString()}; 
     });
     console.log(bounties);  

@@ -37,8 +37,12 @@ contract BountyManagerV2 is Verifier {
     n = ni;
   }
 
+  function hashBounty(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) returns (bytes32) {
+    return keccak256(abi.encodePacked(dataset_hash, public_key[0], public_key[1], mse_cap));
+  }
+
   function addBounty(uint256 dataset_hash, string memory alias_dataset, uint256[2] memory public_key, uint256 mse_cap) public payable {
-    bytes32 h = keccak256(abi.encodePacked(dataset_hash, public_key[0], public_key[1], mse_cap));
+    bytes32 h = hashBounty(dataset_hash, public_key, mse_cap);
     Bounty memory b = Bounty(dataset_hash, public_key[0], public_key[1], mse_cap, msg.value, msg.sender);
     require(bounties_status[h] == false, "bounty already exists");
     bounties[h] = b;
@@ -47,7 +51,7 @@ contract BountyManagerV2 is Verifier {
   }
 
   function removeBounty(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) public {
-    bytes32 h = keccak256(abi.encodePacked(dataset_hash, public_key[0], public_key[1], mse_cap));
+    bytes32 h = hashBounty(dataset_hash, public_key, mse_cap);
     require(bounties_status[h] != false, "bounty does not exist");
     Bounty memory b = bounties[h];
     require(msg.sender == b.owner, "you are not the owner of the bounty");
@@ -64,17 +68,22 @@ contract BountyManagerV2 is Verifier {
           uint[2] memory c,
           uint[131] memory input
       ) public {
-      require(verifyProof(a, b, c, input), "Invalid Proof");
+    require(verifyProof(a, b, c, input), "Invalid Proof");
       
-      uint index_offset = m * p + n * p * 2 + n * 2;
-      uint256 public_key_0 = input[index_offset + 2];
-      uint256 public_key_1 = input[index_offset + 3];
-      uint256 dataset_hash = input[1];
-      uint256 mse_cap = input[0];
+    uint index_offset = m * p + n * p * 2 + n * 2;
+    uint256[2] memory public_key;
+    public_key[0] = input[index_offset + 2];
+    public_key[1] = input[index_offset + 3];
+    uint256 dataset_hash = input[1];
+    uint256 mse_cap = input[0];
       
-      uint256 topay = 0;
-      
-      emit BountyCollected(topay);
+    bytes32 h = hashBounty(dataset_hash, public_key, mse_cap);
+    require(bounties_status[h] != false, "bounty does not exist");
+    Bounty memory b = bounties[h];
+    bounties_status[h] = false;
+    uint topay = b.bounty;
+    to.transfer(topay);
+    emit BountyCollected(topay);
   }
 
   // Function to receive Ether. msg.data must be empty

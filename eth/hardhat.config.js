@@ -83,7 +83,8 @@ task("claim_bounty", "Claim bounty")
   .addParam("payment", "payment address", "0x2546BcD3c84621e976D8185a91A922aE77ECEc30")
   .addParam("publickey", "bounty issuer's publilckey", "./keys/out_public.json")
   .addParam("walletprivatekey", "wallet private key", "./keys/.private_key")
-  .addParam("model", "model", "./model")
+  .addParam("model", "model path", "./model")
+  .addParam("dataset", "dataset path", "./dataset")
   .addParam("settings", "settings", "settings.json")
   .setAction(async (taskArgs) => {
 
@@ -296,14 +297,14 @@ task("add_bounty", "Deposit bounty")
   .addParam("amount", "amount to add to bounty", "49")
   .addParam("keyfile", "file prefix to export private and public key", "out")
   .addParam("walletprivatekey", "private key", "./keys/.private_key")
-  .addParam("model", "model", "./model")
+  .addParam("dataset", "dataset path", "./model")
   .addParam("settings", "settings", "settings.json")
   .setAction(async (taskArgs) => {
 
     const { execSync } = require("child_process");
     const fs = require("fs");
 
-    execSync("python3 scripts/quantize.py --mode dataset --settings "+ taskArgs.settings + " --model " + taskArgs.model, {
+    execSync("python3 scripts/quantize.py --mode dataset --settings "+ taskArgs.settings + " --dataset " + taskArgs.dataset, {
       stdio: "inherit",
     });
 

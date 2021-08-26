@@ -665,7 +665,7 @@ def q_dataset(
         json.dump(data_all, f, indent=2)
 
 
-def quant_dataset(model, setting):
+def quant_dataset(dataset, setting):
 
     data = json.load(open(setting, 'rb'))
 
@@ -692,8 +692,8 @@ def quant_dataset(model, setting):
 
     mse_target = data['mse_target']
 
-    X = np.load(f'{model}/X.npy')
-    Y = np.load(f'{model}/Y.npy')
+    X = np.load(f'{dataset}/X.npy')
+    Y = np.load(f'{dataset}/Y.npy')
 
     q_dataset(
          alpha_X, beta_X,
@@ -706,7 +706,7 @@ def quant_dataset(model, setting):
          X, Y, mse_target)
 
 
-def quant_model(model, setting):
+def quant_model(model, dataset, setting):
 
     data = json.load(open(setting, 'rb'))
 
@@ -736,10 +736,10 @@ def quant_model(model, setting):
 
     mse_target = data['mse_target']
 
-    X = np.load(f'{model}/X.npy')
+    X = np.load(f'{dataset}/X.npy')
     W = np.load(f'{model}/W.npy')
     b = np.load(f'{model}/b.npy')
-    Y = np.load(f'{model}/Y.npy')
+    Y = np.load(f'{dataset}/Y.npy')
 
     q_model(m, p, n, 
          alpha_X, beta_X,
@@ -759,11 +759,12 @@ if __name__ == "__main__":
     parser.add_argument("--mode")
     parser.add_argument("--settings")
     parser.add_argument("--model")
+    parser.add_argument("--dataset")
     args = parser.parse_args()
 
     if args.mode == "model":
-        quant_model(args.model, args.settings)
+        quant_model(args.dataset, args.settings)
     elif args.mode == "dataset":
-        quant_dataset(args.model, args.settings)
+        quant_dataset(args.model, args.dataset, args.settings)
     else:
         assert False

@@ -52,7 +52,7 @@ contract BountyManagerV2 is Verifier {
     uint256 idx = dataset_to_bounties_idx[dataset_hash][h];
     require(idx > 0, "dataset not found");
     uint256 len = dataset_to_bounties[dataset_hash].length;
-    dataset_to_bounties[dataset_hash][idx] = dataset_to_bounties[dataset_hash][len - 1];
+    dataset_to_bounties[dataset_hash][idx - 1] = dataset_to_bounties[dataset_hash][len - 1];
     dataset_to_bounties[dataset_hash].pop();
     dataset_to_bounties_idx[dataset_hash][h] = 0;
   }
@@ -67,7 +67,7 @@ contract BountyManagerV2 is Verifier {
   function remove_from_datasets(uint256 dataset_hash) private {
     uint256 idx = dataset_idx[dataset_hash];
     require(idx > 0, "dataset not found");
-    datasets[idx] = datasets[datasets.length - 1];
+    datasets[idx - 1] = datasets[datasets.length - 1];
     datasets.pop();
     dataset_idx[dataset_hash] = 0;
   }
@@ -133,6 +133,7 @@ contract BountyManagerV2 is Verifier {
     uint topay = bt.bounty;
     to.transfer(topay);
     emit BountyCollected(topay);
+    
     remove_bounty_from_datasets(dataset_hash, h);
     if (dataset_to_bounties[dataset_hash].length == 0) {
         remove_from_datasets(dataset_hash);

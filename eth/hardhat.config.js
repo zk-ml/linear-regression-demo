@@ -43,18 +43,16 @@ task("list_bounties", "List bounties given dataset")
 
     const write_contract = contract.connect(wallet);
 
-    var alias = await write_contract.get_alias(taskArgs.hash);
-
-    console.log("Available bounties on dataset: " + alias);
-    tx = await write_contract.query_bounties(taskArgs.hash);
-    num_bounties = await write_contract.query_num_bounties(taskArgs.hash);
-    const bounties = tx.slice(0, num_bounties).map(function (x) { 
+    console.log("Available bounties on dataset: " + taskArgs.hash);
+    hashes = await write_contract.queryDatasetBounties(taskArgs.hash);
+    const bounties = await Promise.all(hashes.map(async function (hash) { 
+      x = await write_contract.queryBountyHash(hash);
       return {"publickey-1": x[0].toString(), "publickey-2": x[1].toString(), "MSE-Cap":  x[2].toString()}; 
-    });
+    }));
     console.log(bounties);  
   });
 
-  task("list_datasets", "List of datasets with alias")
+task("list_datasets", "List of datasets with alias")
   .addParam("walletprivatekey", "wallet private key", "./keys/.private_key")
   .setAction(async (taskArgs) => {
     const fs = require("fs");
@@ -72,48 +70,6 @@ task("list_bounties", "List bounties given dataset")
     
     console.log("Available datasets:");
     console.log(hashes);
-  });
-
-task("list_bounty_contributors", "List bounty contributor addresses, given dataset") 
-  .addParam("hash", "Dataset hash", "14797455496207951391356508759149962584765968173479481191220882411966396840571")
-  .addParam("publickey", "bounty issuer's publilckey", "./keys/out_public.json")
-  .addParam("mse", "mse cap, quantized", "18406")
-  .addParam("walletprivatekey", "wallet private key", "./keys/.private_key")
-  .setAction(async (taskArgs) => {
-    const fs = require("fs");
-    const BountyManagerV2 = await hre.ethers.getContractFactory('BountyManagerV2');
-    const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
-    const contract = await BountyManagerV2.attach(CONTRACT_ADDRESS);
-    const provider = new hre.ethers.providers.JsonRpcProvider();
-    const pubKey = JSON.parse(fs.readFileSync(taskArgs.publickey));
-    pubKey[0] = BigInt(pubKey[0]);
-    pubKey[1] = BigInt(pubKey[1]);
-
-    const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.walletprivatekey, 'utf-8'));
-    const wallet = wallet_raw.connect(provider);
-
-    const write_contract = contract.connect(wallet);
-    const mse_cap = taskArgs.mse;
-
-    var alias = await write_contract.get_alias(taskArgs.hash);
-
-    console.log("Bounty contributions on dataset: " + alias);
-    console.log("with public key " + pubKey);
-    console.log("quantized mse " + taskArgs.mse);
-    tx = await write_contract.query_bounty_contributors(taskArgs.hash, pubKey, mse_cap);
-    const addresses = tx.map(function (x) { 
-      return x; 
-    });
-
-    const bounties = await Promise.all(addresses.map(async function (addr) {
-      var bt = await write_contract.query_bounty_contribution(taskArgs.hash, pubKey, mse_cap, addr);
-      return ethers.utils.formatEther(bt);
-    }));
-
-    const zip = (a, b) => a.map((k, i) => [k, b[i]]);
-
-    console.log("Contributions for bounty:");
-    console.log(zip(addresses, bounties));
   });
 
 task("remove_bounty", "Remove bounty without claiming") 

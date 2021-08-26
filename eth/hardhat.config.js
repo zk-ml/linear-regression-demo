@@ -30,7 +30,7 @@ task("balance", "Prints an account's balance")
   });
 
 task("list_bounties", "List bounties")
-  .addParam("hash", "Dataset hash", "15681440893605958136105542719628389980032562080249509287477198087707031153419")
+  .addParam("hash", "Dataset hash", "14797455496207951391356508759149962584765968173479481191220882411966396840571")
   .setAction(async (taskArgs) => {
     const fs = require("fs");
     const BountyManager = await hre.ethers.getContractFactory('BountyManager');
@@ -79,7 +79,7 @@ task("list_bounties", "List bounties")
   });
 
 task("list_bounty_contributors", "List bounty contributor addresses") 
-  .addParam("hash", "Dataset hash", "15681440893605958136105542719628389980032562080249509287477198087707031153419")
+  .addParam("hash", "Dataset hash", "14797455496207951391356508759149962584765968173479481191220882411966396840571")
   .addParam("publickey", "bounty issuer's publilckey", "./keys/out_public.json")
   .addParam("mse", "mse cap, quantized", "18406")
   .setAction(async (taskArgs) => {
@@ -108,8 +108,8 @@ task("list_bounty_contributors", "List bounty contributor addresses")
     });
 
     const bounties = await Promise.all(addresses.map(async function (addr) {
-      var alias = await write_contract.query_bounty_contribution(taskArgs.hash, pubkey, mse_cap, addr);
-      return alias;
+      var bt = await write_contract.query_bounty_contribution(taskArgs.hash, pubKey, mse_cap, addr);
+      return ethers.utils.formatEther(bt);
     }));
 
     const zip = (a, b) => a.map((k, i) => [k, b[i]]);

@@ -384,6 +384,9 @@ task("add_bounty", "Deposit bounty")
   .setAction(async (taskArgs) => {
 
     const { execSync } = require("child_process");
+    /* import the ipfs-http-client library */
+    const { create } = require('ipfs-http-client');
+
     const fs = require("fs");
 
     execSync("python3 scripts/quantize.py --mode dataset --settings "+ taskArgs.settings + " --dataset " + taskArgs.dataset, {
@@ -492,8 +495,13 @@ task("add_bounty", "Deposit bounty")
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
     const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.walletprivatekey, 'utf-8'));
-    
     const wallet = wallet_raw.connect(provider);
+
+    /* Create an instance of the client */
+    //const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0');
+    /* upload the file */
+    //const added = await client.add(taskArgs.dataset);
+    //console.log(added);
 
     let overrides = {
       // To convert Ether to Wei:

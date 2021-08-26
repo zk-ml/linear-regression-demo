@@ -13,6 +13,18 @@ contract BountyManager is Verifier {
     uint256 mse;
   }
 
+  struct Bounty {
+    uint256 k1;
+    uint256 k2;
+    uint256 mse;
+    uint256 dataset_hash;
+    address owner; 
+  }
+
+  // array of hashes
+  // mapping from keeack hashes to bounty structs
+
+
   mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(address => uint256))))) perAddressBounty;
   mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => address[])))) perAddressBounty_keys;
 

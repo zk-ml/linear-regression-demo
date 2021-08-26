@@ -338,9 +338,6 @@ task("add_bounty", "Deposit bounty")
   .setAction(async (taskArgs) => {
 
     const { execSync } = require("child_process");
-    /* import the ipfs-http-client library */
-    const { create } = require('ipfs-http-client');
-
     const fs = require("fs");
 
     execSync("python3 scripts/quantize.py --mode dataset --settings "+ taskArgs.settings + " --dataset " + taskArgs.dataset, {
@@ -451,11 +448,50 @@ task("add_bounty", "Deposit bounty")
     const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.walletprivatekey, 'utf-8'));
     const wallet = wallet_raw.connect(provider);
 
-    /* Create an instance of the client */
-    //const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0');
-    /* upload the file */
-    //const added = await client.add(taskArgs.dataset);
-    //console.log(added);
+    const ipfs = require('ipfs-http-client')
+
+    const infura = JSON.parse(fs.readFileSync('./keys/ipfs.json'));
+    const projectId = infura.id;
+    const projectSecret = infura.secret;
+
+    const auth =
+      'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64')
+
+    const client = ipfs.create({
+      host: 'ipfs.infura.io',
+      port: 5001,
+      protocol: 'https',
+      headers: {
+        authorization: auth
+      }
+    })
+
+    X = fs.readFileSync(taskArgs.dataset + "/X.npy", {encoding: 'base64'});
+    Y = fs.readFileSync(taskArgs.dataset + "/Y.npy", {encoding: 'base64'});
+
+    const files = [
+      {
+        path: "dataset/X.npy",
+        content: X.toString()
+      },
+      {
+        path: "dataset/Y.npy",
+        content: Y.toString()
+      }
+    ]
+
+    res = [];
+    for await (const result of client.addAll(files)) {
+      res.push(result);
+    }
+
+    //console.log(res);
+    
+    const cid = res[2].cid.toString();
+
+    console.log("IPFS available at " + cid);
+
+    const note = taskArgs.note + "| https://ipfs.io/ipfs/" + cid;
 
     let overrides = {
       // To convert Ether to Wei:
@@ -464,7 +500,7 @@ task("add_bounty", "Deposit bounty")
 
     const write_contract = contract.connect(wallet);
 
-    tx = await write_contract.addBounty(hash_input, taskArgs.note , key.pubKey.rawPubKey, data.out, overrides);
+    tx = await write_contract.addBounty(hash_input, note , key.pubKey.rawPubKey, data.out, overrides);
    
     //console.log(tx)
     //console.log(hash_input);

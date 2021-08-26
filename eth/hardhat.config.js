@@ -118,6 +118,42 @@ task("list_bounty_contributors", "List bounty contributor addresses")
     console.log(zip(addresses, bounties));
   });
 
+task("remove_bounty", "Remove bounty without claiming") 
+  .addParam("hash", "Dataset hash", "14797455496207951391356508759149962584765968173479481191220882411966396840571")
+  .addParam("publickey", "bounty issuer's publilckey", "./keys/out_public.json")
+  .addParam("walletprivatekey", "wallet private key", "./keys/.private_key")
+  .addParam("mse", "mse cap, quantized", "18406")
+  .setAction(async (taskArgs) => {
+    const fs = require("fs");
+    const BountyManager = await hre.ethers.getContractFactory('BountyManager');
+    const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
+    const contract = await BountyManager.attach(CONTRACT_ADDRESS);
+
+    const pubKey = JSON.parse(fs.readFileSync(taskArgs.publickey));
+    pubKey[0] = BigInt(pubKey[0]);
+    pubKey[1] = BigInt(pubKey[1]);
+
+    const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.walletprivatekey, 'utf-8'));
+    const wallet = wallet_raw.connect(provider);
+
+    const write_contract = contract.connect(wallet);
+    const mse_cap = taskArgs.mse;
+
+    balance = await provider.getBalance(wallet.address);
+    console.log("Paying " + wallet.address);
+    console.log(ethers.utils.formatEther(balance));
+
+    var alias = await write_contract.get_alias(taskArgs.hash);
+
+    console.log("Removing bounty on dataset: " + alias);
+    console.log("with public key " + pubKey);
+    console.log("quantized mse " + taskArgs.mse);
+    tx = await write_contract.removeBounty(taskArgs.hash, pubKey, mse_cap);
+    balance = await provider.getBalance(wallet.address);
+    console.log("Current Balance");
+    console.log(ethers.utils.formatEther(balance));
+  });
+
 task("claim_bounty", "Claim bounty")
   .addParam("payment", "payment address", "0x2546BcD3c84621e976D8185a91A922aE77ECEc30")
   .addParam("publickey", "bounty issuer's publilckey", "./keys/out_public.json")

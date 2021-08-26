@@ -16,8 +16,9 @@ contract BountyManager is Verifier {
   mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(address => uint256))))) perAddressBounty;
   mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => address[])))) perAddressBounty_keys;
 
-  event BountyCollected(uint256 collected);
-  event BountyDeposited(uint256 collected);
+  event BountyCollected(uint256 amount);
+  event BountyRemoved(uint256 amount);
+  event BountyDeposited(uint256 amount);
 
   mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => uint256)))) public bounties;
 
@@ -153,6 +154,17 @@ contract BountyManager is Verifier {
         perAddressBounty_keys[dataset_hash][public_key[0]][public_key[1]][mse_cap].pop();
       }
     }
+    if (bounties[dataset_hash][public_key[0]][public_key[1]][mse_cap] == 0) {
+      _remove_from_bounty_list(dataset_hash, [public_key_0, public_key_1, mse_cap]);
+    }
+    if (length[dataset_hash] == 0) {
+      _remove_from_dataset_list(dataset_hash);
+    }
+
+    address refund_account = message.sender;
+    refund_account.transfer(toremove);
+    emit BountyRemoved(toremove);
+    return toremove;
   }
 
   function collectBounty(

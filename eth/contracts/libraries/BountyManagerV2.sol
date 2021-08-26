@@ -72,6 +72,10 @@ contract BountyManagerV2 is Verifier {
     dataset_idx[dataset_hash] = 0;
   }
 
+  function queryBounty(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) public view returns (Bounty memory) {
+    return bounties[hashBounty(dataset_hash, public_key, mse_cap)];
+  }
+
   function hashBounty(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) private pure returns (bytes32) {
     return keccak256(abi.encodePacked(dataset_hash, public_key[0], public_key[1], mse_cap));
   }

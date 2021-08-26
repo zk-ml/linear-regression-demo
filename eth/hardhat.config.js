@@ -150,11 +150,10 @@ task("remove_bounty", "Remove bounty without claiming")
     console.log("Paying " + wallet.address);
     console.log(ethers.utils.formatEther(balance));
 
-    var alias = await write_contract.get_alias(taskArgs.hash);
+    const bounty = await write_contract.queryBounty(taskArgs.hash, pubKey, mse_cap);
+    const alias = bounty.note;
 
     console.log("Removing bounty on dataset: " + alias);
-    console.log("with public key " + pubKey);
-    console.log("quantized mse " + taskArgs.mse);
     tx = await write_contract.removeBounty(taskArgs.hash, pubKey, mse_cap);
     balance = await provider.getBalance(wallet.address);
     console.log("Current Balance");
@@ -380,6 +379,7 @@ task("add_bounty", "Deposit bounty")
   .addParam("keyfile", "file prefix to export private and public key", "out")
   .addParam("walletprivatekey", "private key", "./keys/.private_key")
   .addParam("dataset", "dataset path", "./dataset")
+  .addParam("note", "dataset description (IPFS link, note, etc.)", ":)")
   .addParam("settings", "settings", "settings.json")
   .setAction(async (taskArgs) => {
 
@@ -510,7 +510,7 @@ task("add_bounty", "Deposit bounty")
 
     const write_contract = contract.connect(wallet);
 
-    tx = await write_contract.addBounty(hash_input, "dataset", key.pubKey.rawPubKey, data.out, overrides);
+    tx = await write_contract.addBounty(hash_input, taskArgs.note , key.pubKey.rawPubKey, data.out, overrides);
    
     //console.log(tx)
     //console.log(hash_input);

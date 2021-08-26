@@ -763,8 +763,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.mode == "model":
-        quant_model(args.dataset, args.settings)
+        quant_model(args.model, args.dataset, args.settings)
     elif args.mode == "dataset":
-        quant_dataset(args.model, args.dataset, args.settings)
+        quant_dataset(args.dataset, args.settings)
     else:
         assert False

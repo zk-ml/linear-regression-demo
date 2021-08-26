@@ -328,6 +328,43 @@ task("claim_bounty", "Claim bounty")
     console.log(ethers.utils.formatEther(balance));
   });
 
+task("download_dataset", "download dataset")
+  .addParam("ipfs", "ipfs path", "QmWLRJVL5uViT7h64bdeUM3GKMWP9DSWRggGC8igDuQdHR")
+  .addParam("path", "save path", "./ipfs_dataset")
+  .setAction(async (taskArgs) => {
+    const fs = require("fs");
+    const infura = JSON.parse(fs.readFileSync('./keys/ipfs.json'));
+    const projectId = infura.id;
+    const projectSecret = infura.secret;
+
+    const axios = require('axios')
+    
+    var response = await axios.post("https://ipfs.infura.io:5001/api/v0/cat?arg=" + taskArgs.ipfs + "/X.npy", {}, {
+      auth: {
+        username: projectId,
+        password: projectSecret
+      }
+    });
+    
+    fs.writeFileSync(
+      taskArgs.path + "/X.npy",
+      response.data,
+      {encoding: 'base64'});
+    
+    response = await axios.post("https://ipfs.infura.io:5001/api/v0/cat?arg=" + taskArgs.ipfs + "/Y.npy", {}, {
+      auth: {
+        username: projectId,
+        password: projectSecret
+      }
+    });
+
+    fs.writeFileSync(
+      taskArgs.path + "/Y.npy",
+      response.data,
+      {encoding: 'base64'});
+
+  });
+
 task("add_bounty", "Deposit bounty") 
   .addParam("amount", "amount to add to bounty", "49")
   .addParam("keyfile", "file prefix to export private and public key", "out")
@@ -491,7 +528,7 @@ task("add_bounty", "Deposit bounty")
 
     console.log("IPFS available at " + cid);
 
-    const note = taskArgs.note + "| https://ipfs.io/ipfs/" + cid;
+    const note = taskArgs.note + " | https://ipfs.io/ipfs/" + cid;
 
     let overrides = {
       // To convert Ether to Wei:
@@ -500,7 +537,7 @@ task("add_bounty", "Deposit bounty")
 
     const write_contract = contract.connect(wallet);
 
-    tx = await write_contract.addBounty(hash_input, note , key.pubKey.rawPubKey, data.out, overrides);
+    tx = await write_contract.addBounty(hash_input, note, key.pubKey.rawPubKey, data.out, overrides);
    
     //console.log(tx)
     //console.log(hash_input);

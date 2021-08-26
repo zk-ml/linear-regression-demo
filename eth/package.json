@@ -29,7 +29,9 @@
     "prettier-plugin-solidity": "^1.0.0-beta.13",
     "solhint": "^3.3.6",
     "solidity-coverage": "^0.7.16",
-    "ipfs-http-client": "^52.0.2"
+    "ipfs-http-client": "^52.0.2",
+    "cids": "^1.1.8",
+    "axios": "^0.21.1"
   },
   "scripts": {
     "compile": "npx hardhat compile",

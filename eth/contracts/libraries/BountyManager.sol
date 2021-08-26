@@ -155,10 +155,10 @@ contract BountyManager is Verifier {
       }
     }
     if (bounties[dataset_hash][public_key[0]][public_key[1]][mse_cap] == 0) {
-      _remove_from_bounty_list(dataset_hash, [public_key_0, public_key_1, mse_cap]);
-    }
-    if (length[dataset_hash] == 0) {
-      _remove_from_dataset_list(dataset_hash);
+      _remove_from_bounty_list(dataset_hash, [public_key[0], public_key[1], mse_cap]);
+      if (length[dataset_hash] == 0) {
+        _remove_from_dataset_list(dataset_hash);
+      }
     }
 
     address refund_account = msg.sender;

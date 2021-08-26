@@ -91,6 +91,8 @@ contract BountyManagerV2 is Verifier {
     bounties[h] = b;
     bounties_status[h] = true;
     emit BountyDeposited(msg.value);
+    add_to_datasets(dataset_hash);
+    add_bounty_to_datasets(dataset_hash, h);
   }
 
   function removeBounty(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) public {
@@ -102,6 +104,10 @@ contract BountyManagerV2 is Verifier {
     uint toremove = b.bounty;
     b.owner.transfer(toremove);
     emit BountyRemoved(toremove);
+    remove_bounty_from_datasets(dataset_hash, h);
+    if (dataset_to_bounties[dataset_hash].length == 0) {
+        remove_from_datasets(dataset_hash);
+    }
   }
 
   function collectBounty(
@@ -127,6 +133,10 @@ contract BountyManagerV2 is Verifier {
     uint topay = bt.bounty;
     to.transfer(topay);
     emit BountyCollected(topay);
+    remove_bounty_from_datasets(dataset_hash, h);
+    if (dataset_to_bounties[dataset_hash].length == 0) {
+        remove_from_datasets(dataset_hash);
+    }
   }
 
   // Function to receive Ether. msg.data must be empty

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "private": "true",
   "devDependencies": {
     "circom": "^0.5.34",
     "circomlib": "^0.2.4",

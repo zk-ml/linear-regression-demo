@@ -303,7 +303,7 @@ def quant_matmul_circuit(
         else:
             string += f" int{ct}"
             ct += 1
-    print(string)
+    #print(string)
 
     b0 = b_q.astype(np.int64)
     for i0 in range(n):
@@ -444,7 +444,7 @@ def q_model(m, p, n,
         sXsWsY_denominator=sXsWsY_denominator,
     )
     assert (Y_q_simulated == _Y_q_simulated).all()
-    print("gemm assertion passed")
+    #print("gemm assertion passed")
     #print("_Y_q_simulated", _Y_q_simulated)
 
     (
@@ -479,7 +479,7 @@ def q_model(m, p, n,
     )
 
     assert (_R_q_simulated == R_q_simulated).all()
-    print("error assertion passed")
+    #print("error assertion passed")
     (
         Sq_q_simulated,
         sR2sSq_numerator,
@@ -501,7 +501,7 @@ def q_model(m, p, n,
     _Sq_q_simulated = quant_mse(R_q_simulated, s_R, s_Sq, z_R, z_Sq, m, n)
 
     assert (_Sq_q_simulated == Sq_q_simulated).all(), (_Sq_q_simulated, Sq_q_simulated)
-    print("mse assertion passed")
+    #print("mse assertion passed")
 
     Mr_simulated = dequantization(Mr_q_simulated, s=s_R, z=z_R)
     Sq_simulated = dequantization(Sq_q_simulated, s=s_Sq, z=z_Sq)
@@ -522,9 +522,9 @@ def q_model(m, p, n,
     #print("Mean Error actual: ", Mr)
     #print("Mean Error simulated: ", Mr_simulated)
     print("Mean Squared Error actual: ", Sq)
-    print("quantized ", Sq_q)
+    print("... quantized ", Sq_q)
     print("Mean Squared Error simulated: ", Sq_simulated)
-    print("quantized ", quantization_arb(x=Sq_simulated, s=s_Sq, z=z_Sq))
+    print("... quantized ", quantization_arb(x=Sq_simulated, s=s_Sq, z=z_Sq))
 
     data_all = dict(
         out=proc(int(_Sq_q_simulated)),

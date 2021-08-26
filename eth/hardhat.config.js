@@ -313,7 +313,7 @@ task("add_bounty", "Deposit bounty")
 
     const rawdata = fs.readFileSync('./artifacts/quantization/inputs_dataset.json');
     const data = JSON.parse(rawdata);
-    console.log(data);
+    //console.log(data);
 
     function tobigint(value) {
       return BigInt(value);

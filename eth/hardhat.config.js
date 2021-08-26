@@ -297,7 +297,7 @@ task("add_bounty", "Deposit bounty")
   .addParam("amount", "amount to add to bounty", "49")
   .addParam("keyfile", "file prefix to export private and public key", "out")
   .addParam("walletprivatekey", "private key", "./keys/.private_key")
-  .addParam("dataset", "dataset path", "./model")
+  .addParam("dataset", "dataset path", "./dataset")
   .addParam("settings", "settings", "settings.json")
   .setAction(async (taskArgs) => {
 

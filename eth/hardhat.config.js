@@ -29,15 +29,17 @@ task("balance", "Prints an account's balance")
     console.log(web3.utils.fromWei(balance, "ether"), "ETH");
   });
 
-task("list_bounties", "List bounties")
+task("list_bounties", "List bounties given dataset")
+  .addParam("walletprivatekey", "wallet private key", "./keys/.private_key")
   .addParam("hash", "Dataset hash", "14797455496207951391356508759149962584765968173479481191220882411966396840571")
   .setAction(async (taskArgs) => {
     const fs = require("fs");
     const BountyManager = await hre.ethers.getContractFactory('BountyManager');
     const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
-
-    wallet = await hre.ethers.getSigner();
+    const provider = new hre.ethers.providers.JsonRpcProvider();
+    const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.walletprivatekey, 'utf-8'));
+    const wallet = wallet_raw.connect(provider);
 
     const write_contract = contract.connect(wallet);
 
@@ -53,6 +55,7 @@ task("list_bounties", "List bounties")
   });
 
   task("list_datasets", "List of datasets with alias")
+  .addParam("walletprivatekey", "wallet private key", "./keys/.private_key")
   .setAction(async (taskArgs) => {
     const fs = require("fs");
     const provider = new hre.ethers.providers.JsonRpcProvider();
@@ -60,7 +63,8 @@ task("list_bounties", "List bounties")
     const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
-    wallet = await hre.ethers.getSigner();
+    const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.walletprivatekey, 'utf-8'));
+    const wallet = wallet_raw.connect(provider);
 
     const write_contract = contract.connect(wallet);
     tx = await write_contract.query_datasets();
@@ -78,21 +82,23 @@ task("list_bounties", "List bounties")
     console.log(zip(aliases, hashes));
   });
 
-task("list_bounty_contributors", "List bounty contributor addresses") 
+task("list_bounty_contributors", "List bounty contributor addresses, given dataset") 
   .addParam("hash", "Dataset hash", "14797455496207951391356508759149962584765968173479481191220882411966396840571")
   .addParam("publickey", "bounty issuer's publilckey", "./keys/out_public.json")
   .addParam("mse", "mse cap, quantized", "18406")
+  .addParam("walletprivatekey", "wallet private key", "./keys/.private_key")
   .setAction(async (taskArgs) => {
     const fs = require("fs");
     const BountyManager = await hre.ethers.getContractFactory('BountyManager');
     const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
-
+    const provider = new hre.ethers.providers.JsonRpcProvider();
     const pubKey = JSON.parse(fs.readFileSync(taskArgs.publickey));
     pubKey[0] = BigInt(pubKey[0]);
     pubKey[1] = BigInt(pubKey[1]);
 
-    wallet = await hre.ethers.getSigner();
+    const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.walletprivatekey, 'utf-8'));
+    const wallet = wallet_raw.connect(provider);
 
     const write_contract = contract.connect(wallet);
     const mse_cap = taskArgs.mse;

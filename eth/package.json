@@ -25,5 +25,9 @@
     "prettier-plugin-solidity": "^1.0.0-beta.13",
     "solhint": "^3.3.6",
     "solidity-coverage": "^0.7.16"
+  },
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "deploy-localhost": "npx hardhat run --network localhost scripts/deploy.js"
   }
 }

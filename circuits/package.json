@@ -14,7 +14,7 @@
     "test": "exit 0",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "dev": "node builder.js lr ../cli/src/Circuits ../cli/src/Circuits ../eth/contracts/libraries true",
-    "prod": "node builder.js lr ../cli/src/Circuits ../cli/src/Circuits ../eth/contracts/libraries false"
+    "dev": "node builder.js lr ../artifacts/src/Circuits ../artifacts/src/Circuits ../eth/contracts/libraries true",
+    "prod": "node builder.js lr ../artifacts/src/Circuits ../artifacts/src/Circuits ../eth/contracts/libraries false"
   }
 }

@@ -368,14 +368,6 @@ task("claim_bounty", "Claim bounty")
     console.log(ethers.utils.formatEther(balance));
   });
 
-task("remove_bounty", "Deposit bounty") 
-  .addParam("keyfile", "file prefix to export private and public key", "out")
-  .addParam("walletprivatekey", "private key", "./keys/.private_key")
-  .addParam("settings", "settings", "settings.json")
-  .setAction(async (taskArgs) => {
-
-  });
-
 task("add_bounty", "Deposit bounty") 
   .addParam("amount", "amount to add to bounty", "49")
   .addParam("keyfile", "file prefix to export private and public key", "out")

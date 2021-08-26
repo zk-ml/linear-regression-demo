@@ -161,7 +161,7 @@ contract BountyManager is Verifier {
       _remove_from_dataset_list(dataset_hash);
     }
 
-    address refund_account = message.sender;
+    address refund_account = msg.sender;
     refund_account.transfer(toremove);
     emit BountyRemoved(toremove);
     return toremove;

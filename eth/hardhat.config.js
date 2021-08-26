@@ -95,12 +95,14 @@ task("list_bounty_contributors", "List bounty contributor addresses")
     wallet = await hre.ethers.getSigner();
 
     const write_contract = contract.connect(wallet);
-    const mse_cap = JSON.parse(fs.readFileSync(taskArgs.settings)).mse;
+    const mse_cap = taskArgs.mse;
 
     var alias = await write_contract.get_alias(taskArgs.hash);
 
-    console.log("Available bounties on dataset: " + alias);
-    tx = await write_contract.query_bounty_contributors(taskArgs.hash, pubkey, mse_cap);
+    console.log("Bounty contributions on dataset: " + alias);
+    console.log("with public key " + pubKey);
+    console.log("quantized mse " + taskArgs.mse);
+    tx = await write_contract.query_bounty_contributors(taskArgs.hash, pubKey, mse_cap);
     const addresses = tx.map(function (x) { 
       return x; 
     });

@@ -91,7 +91,7 @@ contract BountyManager is Verifier {
     n = ni;
   }
 
-  function query_bounty_contribution(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap, address addr) public view returns (address[] memory) {
+  function query_bounty_contribution(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap, address addr) public view returns (uint256) {
     return perAddressBounty[dataset_hash][public_key[0]][public_key[1]][mse_cap][addr];
   }
 

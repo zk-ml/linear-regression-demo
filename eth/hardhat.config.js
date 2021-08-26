@@ -34,9 +34,9 @@ task("list_bounties", "List bounties given dataset")
   .addParam("hash", "Dataset hash", "14797455496207951391356508759149962584765968173479481191220882411966396840571")
   .setAction(async (taskArgs) => {
     const fs = require("fs");
-    const BountyManager = await hre.ethers.getContractFactory('BountyManager');
+    const BountyManagerV2 = await hre.ethers.getContractFactory('BountyManagerV2');
     const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
-    const contract = await BountyManager.attach(CONTRACT_ADDRESS);
+    const contract = await BountyManagerV2.attach(CONTRACT_ADDRESS);
     const provider = new hre.ethers.providers.JsonRpcProvider();
     const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.walletprivatekey, 'utf-8'));
     const wallet = wallet_raw.connect(provider);
@@ -59,9 +59,9 @@ task("list_bounties", "List bounties given dataset")
   .setAction(async (taskArgs) => {
     const fs = require("fs");
     const provider = new hre.ethers.providers.JsonRpcProvider();
-    const BountyManager = await hre.ethers.getContractFactory('BountyManager');
+    const BountyManagerV2 = await hre.ethers.getContractFactory('BountyManagerV2');
     const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
-    const contract = await BountyManager.attach(CONTRACT_ADDRESS);
+    const contract = await BountyManagerV2.attach(CONTRACT_ADDRESS);
 
     const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.walletprivatekey, 'utf-8'));
     const wallet = wallet_raw.connect(provider);
@@ -89,9 +89,9 @@ task("list_bounty_contributors", "List bounty contributor addresses, given datas
   .addParam("walletprivatekey", "wallet private key", "./keys/.private_key")
   .setAction(async (taskArgs) => {
     const fs = require("fs");
-    const BountyManager = await hre.ethers.getContractFactory('BountyManager');
+    const BountyManagerV2 = await hre.ethers.getContractFactory('BountyManagerV2');
     const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
-    const contract = await BountyManager.attach(CONTRACT_ADDRESS);
+    const contract = await BountyManagerV2.attach(CONTRACT_ADDRESS);
     const provider = new hre.ethers.providers.JsonRpcProvider();
     const pubKey = JSON.parse(fs.readFileSync(taskArgs.publickey));
     pubKey[0] = BigInt(pubKey[0]);
@@ -132,9 +132,9 @@ task("remove_bounty", "Remove bounty without claiming")
   .setAction(async (taskArgs) => {
     const provider = new hre.ethers.providers.JsonRpcProvider();
     const fs = require("fs");
-    const BountyManager = await hre.ethers.getContractFactory('BountyManager');
+    const BountyManagerV2 = await hre.ethers.getContractFactory('BountyManagerV2');
     const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
-    const contract = await BountyManager.attach(CONTRACT_ADDRESS);
+    const contract = await BountyManagerV2.attach(CONTRACT_ADDRESS);
 
     const pubKey = JSON.parse(fs.readFileSync(taskArgs.publickey));
     pubKey[0] = BigInt(pubKey[0]);
@@ -333,9 +333,9 @@ task("claim_bounty", "Claim bounty")
     arg3 = publicSignals;
 
     const provider = new hre.ethers.providers.JsonRpcProvider();
-    const BountyManager = await hre.ethers.getContractFactory('BountyManager');
+    const BountyManagerV2 = await hre.ethers.getContractFactory('BountyManagerV2');
     const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
-    const contract = await BountyManager.attach(CONTRACT_ADDRESS);
+    const contract = await BountyManagerV2.attach(CONTRACT_ADDRESS);
 
     const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.walletprivatekey, 'utf-8'));
     const wallet = wallet_raw.connect(provider);
@@ -490,9 +490,9 @@ task("add_bounty", "Deposit bounty")
 
     const provider = new hre.ethers.providers.JsonRpcProvider();
 
-    const BountyManager = await hre.ethers.getContractFactory('BountyManager');
+    const BountyManagerV2 = await hre.ethers.getContractFactory('BountyManagerV2');
     const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
-    const contract = await BountyManager.attach(CONTRACT_ADDRESS);
+    const contract = await BountyManagerV2.attach(CONTRACT_ADDRESS);
 
     const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.walletprivatekey, 'utf-8'));
     const wallet = wallet_raw.connect(provider);

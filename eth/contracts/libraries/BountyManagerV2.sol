@@ -12,8 +12,8 @@ contract BountyManagerV2 is Verifier {
     uint256 k1;
     uint256 k2;
     uint256 mse;
-    uint256 amount;
-    address owner; 
+    uint256 bounty;
+    address payable owner; 
   }
 
   event BountyCollected(uint256 amount);
@@ -40,12 +40,20 @@ contract BountyManagerV2 is Verifier {
   function addBounty(uint256 dataset_hash, string memory alias_dataset, uint256[2] memory public_key, uint256 mse_cap) public payable {
     bytes32 h = keccak256(abi.encodePacked(dataset_hash, public_key[0], public_key[1], mse_cap));
     Bounty memory b = Bounty(dataset_hash, public_key[0], public_key[1], mse_cap, msg.value, msg.sender);
+    require(bounties_status[h] == false, "bounty already exists");
     bounties[h] = b;
+    bounties_status[h] = true;
     emit BountyDeposited(msg.value);
   }
 
   function removeBounty(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) public {
-    uint toremove = 0;
+    bytes32 h = keccak256(abi.encodePacked(dataset_hash, public_key[0], public_key[1], mse_cap));
+    require(bounties_status[h] != false, "bounty does not exist");
+    Bounty memory b = bounties[h];
+    require(msg.sender == b.owner, "you are not the owner of the bounty");
+    bounties_status[h] = false;
+    uint toremove = b.bounty;
+    b.owner.transfer(toremove);
     emit BountyRemoved(toremove);
   }
 

@@ -16,8 +16,8 @@ async function main() {
 
   // We get the contract to deploy
   const fs = require("fs");
-  const BountyManager = await hre.ethers.getContractFactory("BountyManager");
-  const bm = await BountyManager.deploy(20, 4, 1);
+  const BountyManagerV2 = await hre.ethers.getContractFactory("BountyManagerV2");
+  const bm = await BountyManagerV2.deploy(20, 4, 1);
 
   await bm.deployed();
 
@@ -39,7 +39,7 @@ async function main() {
 
   //console.log(res)
 
-  console.log("BountyManager deployed to:", bm.address);
+  console.log("BountyManagerV2 deployed to:", bm.address);
 
   fs.writeFileSync(
     './artifacts/.env_contract',

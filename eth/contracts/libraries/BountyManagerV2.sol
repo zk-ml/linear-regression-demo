@@ -41,6 +41,20 @@ contract BountyManagerV2 is Verifier {
     n = ni;
   }
 
+  function add_bounty_to_datasets(uint256 dataset_hash, bytes32 h) private {
+    if (dataset_to_bounties_idx[dataset_hash][h] == 0) {
+        dataset_to_bounties_idx[dataset_hash].push(h);
+        dataset_to_bounties_idx[dataset_hash][h] = dataset_to_bounties_idx[dataset_hash].length + 1;
+    }
+  }
+
+  function remove_bounty_from_datasets(uint256 dataset_hash) private {
+    uint256 idx = dataset_to_bounties_idx[dataset_hash];
+    require(idx > 0, "dataset not found");
+    dataset_to_bounties_idx[dataset_hash][idx] = dataset_to_bounties_idx[dataset_hash][dataset_to_bounties_idx[dataset_hash].length - 1];
+    dataset_to_bounties_idx[dataset_hash].pop();
+  }
+
   function add_to_datasets(uint256 dataset_hash) private {
     if (dataset_idx[dataset_hash] == 0) {
         datasets.push(dataset_hash);

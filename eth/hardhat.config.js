@@ -254,7 +254,7 @@ task("claim_bounty", "Claim bounty")
     const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
-    const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.privKey, 'utf-8'));
+    const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.privatekey, 'utf-8'));
     const wallet = wallet_raw.connect(provider);
 
     const write_contract = contract.connect(wallet);
@@ -294,8 +294,8 @@ task("claim_bounty", "Claim bounty")
 
 task("add_bounty", "Deposit bounty") 
   .addParam("amount", "amount to add to bounty", "49")
-  .addParam("outFile", "file prefix to export private and public key", "out")
-  .addParam("privKey", "private key", "./keys/.private_key")
+  .addParam("file", "file prefix to export private and public key", "out")
+  .addParam("privatekey", "private key", "./keys/.private_key")
   .addParam("model", "model", "./model")
   .addParam("settings", "settings", "settings.json")
   .setAction(async (taskArgs) => {
@@ -391,13 +391,13 @@ task("add_bounty", "Deposit bounty")
     BigInt.prototype.toJSON = function() { return this.toString()  }
 
     fs.writeFileSync(
-      './keys/'+taskArgs.outFile + '_public.json',
+      './keys/'+taskArgs.file + '_public.json',
       JSON.stringify(key.pubKey.rawPubKey, null, 2),
       () => {},
     );
 
     fs.writeFileSync(
-      './keys/'+taskArgs.outFile + '_private.json',
+      './keys/'+taskArgs.file + '_private.json',
       JSON.stringify(key.privKey.rawPrivKey, null, 2),
       () => {},
     );
@@ -408,7 +408,7 @@ task("add_bounty", "Deposit bounty")
     const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
-    const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.privKey, 'utf-8'));
+    const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.privatekey, 'utf-8'));
     
     const wallet = wallet_raw.connect(provider);
 

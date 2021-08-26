@@ -13,7 +13,8 @@ contract BountyManagerV2 is Verifier {
     uint256 k2;
     uint256 mse;
     uint256 bounty;
-    address payable owner; 
+    address payable owner;
+    string note;
   }
 
   event BountyCollected(uint256 amount);
@@ -28,8 +29,11 @@ contract BountyManagerV2 is Verifier {
   mapping(bytes32 => bool) public bounties_status;
   bytes32[] bounty_hashes;
 
+  mapping(uint256 => bytes32[]) dataset_to_bounties;
+  mapping(uint256 => mapping(bytes32 => uint256)) dataset_to_bounties_idx;
+  
   uint256[] public datasets;
-  mapping(uint256 => string) dataset_aliases;
+  mapping(uint256 => uint256) dataset_idx;
 
   constructor(uint mi, uint pi, uint ni) public payable {
     m = mi;
@@ -37,13 +41,27 @@ contract BountyManagerV2 is Verifier {
     n = ni;
   }
 
-  function hashBounty(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) returns (bytes32) {
+  function add_to_datasets(uint256 dataset_hash) private {
+    if (dataset_idx[dataset_hash] == 0) {
+        datasets.push(dataset_hash);
+        dataset_idx[dataset_hash] = datasets.length + 1;
+    }
+  }
+
+  function remove_from_datasets(uint256 dataset_hash) private {
+    uint256 idx = dataset_idx[dataset_hash];
+    require(idx > 0, "dataset not found");
+    datasets[idx] = datasets[datasets.length - 1];
+    datasets.pop();
+  }
+
+  function hashBounty(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) private pure returns (bytes32) {
     return keccak256(abi.encodePacked(dataset_hash, public_key[0], public_key[1], mse_cap));
   }
 
-  function addBounty(uint256 dataset_hash, string memory alias_dataset, uint256[2] memory public_key, uint256 mse_cap) public payable {
+  function addBounty(uint256 dataset_hash, string memory note, uint256[2] memory public_key, uint256 mse_cap) public payable {
     bytes32 h = hashBounty(dataset_hash, public_key, mse_cap);
-    Bounty memory b = Bounty(dataset_hash, public_key[0], public_key[1], mse_cap, msg.value, msg.sender);
+    Bounty memory b = Bounty(dataset_hash, public_key[0], public_key[1], mse_cap, msg.value, msg.sender, note);
     require(bounties_status[h] == false, "bounty already exists");
     bounties[h] = b;
     bounties_status[h] = true;
@@ -79,9 +97,9 @@ contract BountyManagerV2 is Verifier {
       
     bytes32 h = hashBounty(dataset_hash, public_key, mse_cap);
     require(bounties_status[h] != false, "bounty does not exist");
-    Bounty memory b = bounties[h];
+    Bounty memory bt = bounties[h];
     bounties_status[h] = false;
-    uint topay = b.bounty;
+    uint topay = bt.bounty;
     to.transfer(topay);
     emit BountyCollected(topay);
   }

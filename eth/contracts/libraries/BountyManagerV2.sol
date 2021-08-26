@@ -34,11 +34,24 @@ contract BountyManagerV2 is Verifier {
   
   uint256[] public datasets;
   mapping(uint256 => uint256) dataset_idx;
+  mapping(uint256 => string) public dataset_descriptions;
+
+  address deployer;
 
   constructor(uint mi, uint pi, uint ni) public payable {
     m = mi;
     p = pi;
     n = ni;
+    deployer = msg.sender;
+  }
+
+  function changeDatasetDescription(uint256 dataset_hash, string memory description) public {
+      require(msg.sender == deployer, "only the deployer can change dataset descriptions");
+      dataset_descriptions[dataset_hash] = description;
+  }
+
+  function getDatasetDescription(uint256 dataset_hash) public view returns (string memory) {
+      return dataset_descriptions[dataset_hash];
   }
 
   function add_bounty_to_datasets(uint256 dataset_hash, bytes32 h) private {

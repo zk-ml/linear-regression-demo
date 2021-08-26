@@ -295,7 +295,7 @@ task("claim_bounty", "Claim bounty")
 task("add_bounty", "Deposit bounty") 
   .addParam("amount", "amount to add to bounty", "49")
   .addParam("keyfile", "file prefix to export private and public key", "out")
-  .addParam("privatekey", "private key", "./keys/.private_key")
+  .addParam("walletprivatekey", "private key", "./keys/.private_key")
   .addParam("model", "model", "./model")
   .addParam("settings", "settings", "settings.json")
   .setAction(async (taskArgs) => {
@@ -408,7 +408,7 @@ task("add_bounty", "Deposit bounty")
     const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
     const contract = await BountyManager.attach(CONTRACT_ADDRESS);
 
-    const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.privatekey, 'utf-8'));
+    const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.walletprivatekey, 'utf-8'));
     
     const wallet = wallet_raw.connect(provider);
 

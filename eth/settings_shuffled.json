@@ -1,0 +1,20 @@
+{
+  "alpha_X": 0,
+  "beta_X": 8,
+  "alpha_W": -1,
+  "beta_W": 8,
+  "alpha_Y": 0,
+  "beta_Y": 8,
+  "alpha_Yt": 0,
+  "beta_Yt": 8,
+  "alpha_b": 0,
+  "beta_b": 8,
+  "alpha_R": -10,
+  "beta_R": 10,
+  "alpha_S": 0,
+  "beta_S": 30,
+  "m": 20,
+  "p": 4,
+  "n": 1,
+  "mse_target": 0.11232375
+}

@@ -5,3 +5,4 @@ yarn-error.log
 *.swp
 eth/.ipynb_checkpoints/demo-checkpoint.ipynb
 artifacts/src/Circuits/lr/lr.zkey
+*.pyc

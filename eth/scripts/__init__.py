@@ -1,1 +1,1 @@
-from .quantize_model import q_model, q_dataset, quant_dataset, quant_model
+from .quantize import q_model, q_dataset, quant_dataset, quant_model

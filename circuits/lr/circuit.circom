@@ -417,7 +417,7 @@ template quant_gemm_mse_enc(m,p,n) {
     // n * 2
     signal input b_q_enc[n][2];
     signal private input private_key;
-    signal input public_key[2];
+    signal input public_key[2]; // could be private
 
     /* section total: 8 */
     signal input z_X; 

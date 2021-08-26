@@ -81,9 +81,39 @@ task("list_bounties", "List bounties")
 task("list_bounty_contributors", "List bounty contributor addresses") 
   .addParam("hash", "Dataset hash", "15681440893605958136105542719628389980032562080249509287477198087707031153419")
   .addParam("publickey", "bounty issuer's publilckey", "./keys/out_public.json")
-  .addParam("settings", "settings", "settings.json")
+  .addParam("mse", "mse cap, quantized", "18406")
   .setAction(async (taskArgs) => {
-    
+    const fs = require("fs");
+    const BountyManager = await hre.ethers.getContractFactory('BountyManager');
+    const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
+    const contract = await BountyManager.attach(CONTRACT_ADDRESS);
+
+    const pubKey = JSON.parse(fs.readFileSync(taskArgs.publickey));
+    pubKey[0] = BigInt(pubKey[0]);
+    pubKey[1] = BigInt(pubKey[1]);
+
+    wallet = await hre.ethers.getSigner();
+
+    const write_contract = contract.connect(wallet);
+    const mse_cap = JSON.parse(fs.readFileSync(taskArgs.settings)).mse;
+
+    var alias = await write_contract.get_alias(taskArgs.hash);
+
+    console.log("Available bounties on dataset: " + alias);
+    tx = await write_contract.query_bounty_contributors(taskArgs.hash, pubkey, mse_cap);
+    const addresses = tx.map(function (x) { 
+      return x; 
+    });
+
+    const bounties = await Promise.all(addresses.map(async function (addr) {
+      var alias = await write_contract.query_bounty_contribution(taskArgs.hash, pubkey, mse_cap, addr);
+      return alias;
+    }));
+
+    const zip = (a, b) => a.map((k, i) => [k, b[i]]);
+
+    console.log("Contributions for bounty:");
+    console.log(zip(addresses, bounties));
   });
 
 task("claim_bounty", "Claim bounty")

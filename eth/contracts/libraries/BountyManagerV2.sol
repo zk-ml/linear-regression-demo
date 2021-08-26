@@ -43,16 +43,18 @@ contract BountyManagerV2 is Verifier {
 
   function add_bounty_to_datasets(uint256 dataset_hash, bytes32 h) private {
     if (dataset_to_bounties_idx[dataset_hash][h] == 0) {
-        dataset_to_bounties_idx[dataset_hash].push(h);
-        dataset_to_bounties_idx[dataset_hash][h] = dataset_to_bounties_idx[dataset_hash].length + 1;
+        dataset_to_bounties[dataset_hash].push(h);
+        dataset_to_bounties_idx[dataset_hash][h] = dataset_to_bounties[dataset_hash].length + 1;
     }
   }
 
-  function remove_bounty_from_datasets(uint256 dataset_hash) private {
-    uint256 idx = dataset_to_bounties_idx[dataset_hash];
+  function remove_bounty_from_datasets(uint256 dataset_hash, bytes32 h) private {
+    uint256 idx = dataset_to_bounties_idx[dataset_hash][h];
     require(idx > 0, "dataset not found");
-    dataset_to_bounties_idx[dataset_hash][idx] = dataset_to_bounties_idx[dataset_hash][dataset_to_bounties_idx[dataset_hash].length - 1];
-    dataset_to_bounties_idx[dataset_hash].pop();
+    uint256 len = dataset_to_bounties[dataset_hash].length;
+    dataset_to_bounties[dataset_hash][idx] = dataset_to_bounties[dataset_hash][len - 1];
+    dataset_to_bounties[dataset_hash].pop();
+    dataset_to_bounties_idx[dataset_hash][h] = 0;
   }
 
   function add_to_datasets(uint256 dataset_hash) private {
@@ -67,6 +69,7 @@ contract BountyManagerV2 is Verifier {
     require(idx > 0, "dataset not found");
     datasets[idx] = datasets[datasets.length - 1];
     datasets.pop();
+    dataset_idx[dataset_hash] = 0;
   }
 
   function hashBounty(uint256 dataset_hash, uint256[2] memory public_key, uint256 mse_cap) private pure returns (bytes32) {

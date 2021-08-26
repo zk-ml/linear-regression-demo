@@ -92,7 +92,7 @@ task("claim_bounty", "Claim bounty")
     const fs = require("fs");
     const snarkjs = require("snarkjs");
 
-    execSync("python3 scripts/quantize.py --mode model --settings "+ taskArgs.settings + " --model " + taskArgs.model, {
+    execSync("python3 scripts/quantize.py --mode model --settings "+ taskArgs.settings + " --model " + taskArgs.model + " --dataset " + taskArgs.dataset, {
       stdio: "inherit",
     });
 

@@ -78,6 +78,14 @@ task("list_bounties", "List bounties")
     console.log(zip(aliases, hashes));
   });
 
+task("list_bounty_contributors", "List bounty contributor addresses") 
+  .addParam("hash", "Dataset hash", "15681440893605958136105542719628389980032562080249509287477198087707031153419")
+  .addParam("publickey", "bounty issuer's publilckey", "./keys/out_public.json")
+  .addParam("settings", "settings", "settings.json")
+  .setAction(async (taskArgs) => {
+    
+  });
+
 task("claim_bounty", "Claim bounty")
   .addParam("payment", "payment address", "0x2546BcD3c84621e976D8185a91A922aE77ECEc30")
   .addParam("publickey", "bounty issuer's publilckey", "./keys/out_public.json")
@@ -290,6 +298,14 @@ task("claim_bounty", "Claim bounty")
     balance = await provider.getBalance(taskArgs.payment);
     console.log("Current Balance");
     console.log(ethers.utils.formatEther(balance));
+  });
+
+task("remove_bounty", "Deposit bounty") 
+  .addParam("keyfile", "file prefix to export private and public key", "out")
+  .addParam("walletprivatekey", "private key", "./keys/.private_key")
+  .addParam("settings", "settings", "settings.json")
+  .setAction(async (taskArgs) => {
+
   });
 
 task("add_bounty", "Deposit bounty") 

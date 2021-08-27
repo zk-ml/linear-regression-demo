@@ -23,7 +23,7 @@ task("server", "runs REST api server", async () => {
 
   app.post('/add_bounty', async (req, res) => {
     try {
-      add_bounty(req.body);
+      await add_bounty(req.body);
       res.json({bounty_status: "added"});
     }
     catch (err) {
@@ -33,7 +33,7 @@ task("server", "runs REST api server", async () => {
 
   app.post('/claim_bounty', async (req, res) => {
     try {
-      claim_bounty(req.body);
+      await claim_bounty(req.body);
       res.json({bounty_status: "added"});
     }
     catch (err) {

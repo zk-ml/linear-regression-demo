@@ -37,6 +37,6 @@
     "compile": "npx hardhat compile",
     "deploy-localhost": "npx hardhat run --network localhost scripts/deploy.js",
     "deploy-xdai": "npx hardhat run --network xdai scripts/deploy.js",
-    "prepare-demo": "npx hardhat compile && npx hardhat run --network localhost scripts/deploy.js && npx hardhat add_bounty"
+    "prepare-demo": "npx hardhat compile && npx hardhat run --network localhost scripts/deploy.js && npx hardhat add_bounty --amount 5"
   }
 }

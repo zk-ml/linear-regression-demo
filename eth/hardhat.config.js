@@ -79,7 +79,7 @@ task("list_datasets", "List of datasets with alias")
 task("remove_bounty", "Remove bounty without claiming") 
   .addParam("hash", "Dataset hash", "14797455496207951391356508759149962584765968173479481191220882411966396840571")
   .addParam("publickey", "bounty issuer's publilckey", "./keys/out_public.json")
-  .addParam("mse", "mse cap, quantized", "18406")
+  .addParam("mse", "mse cap, quantized", "12888")
   .setAction(async (taskArgs) => {
     const provider = new hre.ethers.providers.JsonRpcProvider(process.env.URL);
     const fs = require("fs");
@@ -104,11 +104,8 @@ task("remove_bounty", "Remove bounty without claiming")
     const bounty = await write_contract.queryBounty(taskArgs.hash, pubKey, mse_cap);
     const alias = bounty.ipfs;
 
-    console.log("Removing bounty on dataset: " + alias);
+    console.log("Removing bounty on dataset at: " + alias);
     tx = await write_contract.removeBounty(taskArgs.hash, pubKey, mse_cap);
-    balance = await provider.getBalance(wallet.address);
-    console.log("Current Balance");
-    console.log(ethers.utils.formatEther(balance));
   });
 
 task("claim_bounty", "Claim bounty")
@@ -327,7 +324,7 @@ task("claim_bounty", "Claim bounty")
 task("download_dataset", "download dataset")
   .addParam("hash", "Dataset hash", "14797455496207951391356508759149962584765968173479481191220882411966396840571")
   .addParam("publickey", "bounty issuer's publilckey", "./keys/out_public.json")
-  .addParam("mse", "mse cap, quantized", "18406")
+  .addParam("mse", "mse cap, quantized", "12888")
   .addParam("path", "save path", "./ipfs_dataset")
   .setAction(async (taskArgs) => {
     console.log("Downloading from IPFS to " + taskArgs.path + " ...");

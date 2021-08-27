@@ -7,6 +7,7 @@ Truly private machine learning.
 * `cd circuits && yarn prod` to build the circuits
 * `cd eth && yarn compile && yarn deploy-{NETWORK}` to deploy the contracts
 * `export PRIVATE_KEY=... && export URL=...` to export private key and RPC URL
+* for jupyter, run `jupyter kernelspec list` to find `kernel.json` and add an `"env": {"PRIVATE_KEY":"...", "URL":"..."}` entry
 * `./zkml` to interact with cli
 
 ### Check it out on-chain

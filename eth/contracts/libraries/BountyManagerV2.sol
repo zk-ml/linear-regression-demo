@@ -21,9 +21,9 @@ contract BountyManagerV2 is Verifier {
   event BountyRemoved(uint256 amount);
   event BountyDeposited(uint256 amount);
 
-  uint m;
-  uint p;
-  uint n;
+  uint immutable m;
+  uint immutable p;
+  uint immutable n;
 
   mapping(bytes32 => Bounty) public bounties;
   mapping(bytes32 => bool) public bounties_status;
@@ -36,7 +36,7 @@ contract BountyManagerV2 is Verifier {
   mapping(uint256 => uint256) dataset_idx;
   mapping(uint256 => string) public dataset_descriptions;
 
-  address deployer;
+  address immutable deployer;
 
   constructor(uint mi, uint pi, uint ni) public payable {
     m = mi;
@@ -46,7 +46,7 @@ contract BountyManagerV2 is Verifier {
   }
 
   function changeDatasetDescription(uint256 dataset_hash, string memory description) public {
-      require(msg.sender == deployer, "only the deployer can change dataset descriptions");
+      require(msg.sender == deployer, "only the deployer can change dataset descriptions"); //remove message
       dataset_descriptions[dataset_hash] = description;
   }
 

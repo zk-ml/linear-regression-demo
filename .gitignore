@@ -8,3 +8,4 @@ artifacts/src/Circuits/lr/lr.zkey
 *.pyc
 eth/keys/ipfs.json
 eth/keys/.private_key
+artifacts/src/Circuits/lr/lr.wasm

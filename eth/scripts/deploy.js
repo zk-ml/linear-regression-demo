@@ -21,24 +21,6 @@ async function main() {
 
   await bm.deployed();
 
-  // If you don't specify a //url//, Ethers connects to the default 
-  // (i.e. ``http:/\/localhost:8545``)
-  const provider = new hre.ethers.providers.JsonRpcProvider();
-
-  tx = {
-    to: bm.address,
-    value: hre.ethers.utils.parseEther("1.0")
-  }
-
-  wallet = await hre.ethers.getSigner();
-
-  // Querying the network
-  //console.log(await wallet.getBalance());
-
-  res = await wallet.sendTransaction(tx);
-
-  //console.log(res)
-
   console.log("BountyManagerV2 deployed to:", bm.address);
 
   fs.writeFileSync(
@@ -47,8 +29,6 @@ async function main() {
     () => {},
   );
 
-  console.log("Ether Balance: " + ethers.utils.formatEther(await provider.getBalance(bm.address)));
-  console.log("Transaction Count: " + await provider.getTransactionCount(bm.address));
 }
 
 // We recommend this pattern to be able to use async/await everywhere

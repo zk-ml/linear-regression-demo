@@ -7,3 +7,4 @@ eth/.ipynb_checkpoints/demo-checkpoint.ipynb
 artifacts/src/Circuits/lr/lr.zkey
 *.pyc
 eth/keys/ipfs.json
+eth/keys/.private_key

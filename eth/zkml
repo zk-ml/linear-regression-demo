@@ -1,2 +1,2 @@
 #!/bin/zsh
-npx hardhat --network localhost "$@"
+npx hardhat --network xdai "$@"

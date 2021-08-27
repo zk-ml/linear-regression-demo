@@ -92,7 +92,7 @@ async function run() {
     if (process.argv.length !== 3) {
       const templates = {};
       templates.groth16 = await fs.promises.readFile(cwd+"/templates/verifier_groth16.sol.ejs", "utf8");
-      templates.plonk = await fs.promises.readFile(cwd+"/templates/verifier_plonk.sol.ejs", "utf8");  
+      //templates.plonk = await fs.promises.readFile(cwd+"/templates/verifier_plonk.sol.ejs", "utf8");  
       //const template = cwd+"/templates/verifier_groth16.sol.ejs";
       //console.log(templates);
       //console.log(final_zkey);

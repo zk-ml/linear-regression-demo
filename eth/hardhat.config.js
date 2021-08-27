@@ -53,6 +53,7 @@ task("list_bounties", "List bounties given dataset")
               "Bounty": ethers.utils.formatEther(x[4]).toString(),
               "Issuer": x[5].toString(),
               "Note": x[6].toString(),
+              "IPFS": x[7].toString(),
              }; 
     }));
     console.log(bounties);  
@@ -526,9 +527,7 @@ task("add_bounty", "Deposit bounty")
     
     const cid = res[2].cid.toString();
 
-    console.log("IPFS available at " + cid);
-
-    const note = taskArgs.note + " | https://ipfs.io/ipfs/" + cid;
+    console.log("IPFS available at https://ipfs.io/ipfs/" + cid);
 
     let overrides = {
       // To convert Ether to Wei:
@@ -537,7 +536,7 @@ task("add_bounty", "Deposit bounty")
 
     const write_contract = contract.connect(wallet);
 
-    tx = await write_contract.addBounty(hash_input, note, key.pubKey.rawPubKey, data.out, overrides);
+    tx = await write_contract.addBounty(hash_input, note, cid, key.pubKey.rawPubKey, data.out, overrides);
    
     //console.log(tx)
     //console.log(hash_input);

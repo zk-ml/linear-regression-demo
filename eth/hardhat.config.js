@@ -21,7 +21,7 @@ task("server", "runs REST api server", async () => {
     res.json({test: "successful"})
   });
 
-  app.get('/add_bounty', async (req, res) => {
+  app.post('/add_bounty', async (req, res) => {
     try {
       add_bounty(req.body);
       res.json({bounty_status: "added"});
@@ -31,7 +31,7 @@ task("server", "runs REST api server", async () => {
     }
   });
 
-  app.get('/claim_bounty', async (req, res) => {
+  app.post('/claim_bounty', async (req, res) => {
     try {
       claim_bounty(req.body);
       res.json({bounty_status: "added"});

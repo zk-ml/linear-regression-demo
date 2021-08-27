@@ -35,6 +35,7 @@
   },
   "scripts": {
     "compile": "npx hardhat compile",
-    "deploy-localhost": "npx hardhat run --network localhost scripts/deploy.js"
+    "deploy-localhost": "npx hardhat run --network localhost scripts/deploy.js",
+    "prepare-demo": "npx hardhat compile && npx hardhat run --network localhost scripts/deploy.js && npx hardhat add_bounty"
   }
 }

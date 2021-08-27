@@ -2,6 +2,8 @@
 
 Truly private machine learning.
 
+![fig](protocol_overview.jpg)
+
 ### Running
 
 * `cd circuits && yarn prod` to build the circuits

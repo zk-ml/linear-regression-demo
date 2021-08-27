@@ -52,8 +52,7 @@ task("list_bounties", "List bounties given dataset")
               "MSEcap":  x[3].toString(),
               "Bounty": ethers.utils.formatEther(x[4]).toString(),
               "Issuer": x[5].toString(),
-              "Note": x[6].toString(),
-              "IPFS": x[7].toString(),
+              "IPFS": x[6].toString(),
              }; 
     }));
     console.log(bounties);  
@@ -106,7 +105,7 @@ task("remove_bounty", "Remove bounty without claiming")
     console.log(ethers.utils.formatEther(balance));
 
     const bounty = await write_contract.queryBounty(taskArgs.hash, pubKey, mse_cap);
-    const alias = bounty.note;
+    const alias = bounty.ipfs;
 
     console.log("Removing bounty on dataset: " + alias);
     tx = await write_contract.removeBounty(taskArgs.hash, pubKey, mse_cap);
@@ -330,17 +329,40 @@ task("claim_bounty", "Claim bounty")
   });
 
 task("download_dataset", "download dataset")
-  .addParam("ipfs", "ipfs path", "QmWLRJVL5uViT7h64bdeUM3GKMWP9DSWRggGC8igDuQdHR")
+  .addParam("hash", "Dataset hash", "14797455496207951391356508759149962584765968173479481191220882411966396840571")
+  .addParam("publickey", "bounty issuer's publilckey", "./keys/out_public.json")
+  .addParam("walletprivatekey", "wallet private key", "./keys/.private_key")
+  .addParam("mse", "mse cap, quantized", "18406")
   .addParam("path", "save path", "./ipfs_dataset")
   .setAction(async (taskArgs) => {
+    console.log("Downloading from IPFS to " + taskArgs.path + " ...");
+    
+    const provider = new hre.ethers.providers.JsonRpcProvider();
     const fs = require("fs");
+    const BountyManagerV2 = await hre.ethers.getContractFactory('BountyManagerV2');
+    const CONTRACT_ADDRESS = fs.readFileSync('./artifacts/.env_contract', 'utf-8');
+    const contract = await BountyManagerV2.attach(CONTRACT_ADDRESS);
+
+    const pubKey = JSON.parse(fs.readFileSync(taskArgs.publickey));
+    pubKey[0] = BigInt(pubKey[0]);
+    pubKey[1] = BigInt(pubKey[1]);
+
+    const wallet_raw = new hre.ethers.Wallet(fs.readFileSync(taskArgs.walletprivatekey, 'utf-8'));
+    const wallet = wallet_raw.connect(provider);
+
+    const write_contract = contract.connect(wallet);
+    const mse_cap = taskArgs.mse;
+
+    const bounty = await write_contract.queryBounty(taskArgs.hash, pubKey, mse_cap);
+    const cid = bounty.ipfs;
+
     const infura = JSON.parse(fs.readFileSync('./keys/ipfs.json'));
     const projectId = infura.id;
     const projectSecret = infura.secret;
 
     const axios = require('axios')
     
-    var response = await axios.post("https://ipfs.infura.io:5001/api/v0/cat?arg=" + taskArgs.ipfs + "/X.npy", {}, {
+    var response = await axios.post("https://ipfs.infura.io:5001/api/v0/cat?arg=" + cid + "/X.npy", {}, {
       auth: {
         username: projectId,
         password: projectSecret
@@ -352,7 +374,7 @@ task("download_dataset", "download dataset")
       response.data,
       {encoding: 'base64'});
     
-    response = await axios.post("https://ipfs.infura.io:5001/api/v0/cat?arg=" + taskArgs.ipfs + "/Y.npy", {}, {
+    response = await axios.post("https://ipfs.infura.io:5001/api/v0/cat?arg=" + cid + "/Y.npy", {}, {
       auth: {
         username: projectId,
         password: projectSecret
@@ -371,7 +393,6 @@ task("add_bounty", "Deposit bounty")
   .addParam("keyfile", "file prefix to export private and public key", "out")
   .addParam("walletprivatekey", "private key", "./keys/.private_key")
   .addParam("dataset", "dataset path", "./dataset")
-  .addParam("note", "dataset description (IPFS link, note, etc.)", ":)")
   .addParam("settings", "settings", "settings.json")
   .setAction(async (taskArgs) => {
 
@@ -536,7 +557,7 @@ task("add_bounty", "Deposit bounty")
 
     const write_contract = contract.connect(wallet);
 
-    tx = await write_contract.addBounty(hash_input, note, cid, key.pubKey.rawPubKey, data.out, overrides);
+    tx = await write_contract.addBounty(hash_input, cid, key.pubKey.rawPubKey, data.out, overrides);
    
     //console.log(tx)
     //console.log(hash_input);

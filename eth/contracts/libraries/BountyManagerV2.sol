@@ -14,7 +14,6 @@ contract BountyManagerV2 is Verifier {
     uint256 mse;
     uint256 bounty;
     address payable owner;
-    string note;
     string ipfs;
   }
 
@@ -106,9 +105,9 @@ contract BountyManagerV2 is Verifier {
     return keccak256(abi.encodePacked(dataset_hash, public_key[0], public_key[1], mse_cap));
   }
 
-  function addBounty(uint256 dataset_hash, string memory note, string memory ipfs, uint256[2] memory public_key, uint256 mse_cap) public payable {
+  function addBounty(uint256 dataset_hash, string memory ipfs, uint256[2] memory public_key, uint256 mse_cap) public payable {
     bytes32 h = hashBounty(dataset_hash, public_key, mse_cap);
-    Bounty memory b = Bounty(dataset_hash, public_key[0], public_key[1], mse_cap, msg.value, msg.sender, note, ipfs);
+    Bounty memory b = Bounty(dataset_hash, public_key[0], public_key[1], mse_cap, msg.value, msg.sender, ipfs);
     require(bounties_status[h] == false, "bounty already exists");
     bounties[h] = b;
     bounties_status[h] = true;

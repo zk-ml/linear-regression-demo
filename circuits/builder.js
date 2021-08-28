@@ -84,18 +84,11 @@ async function run() {
         cwd + "/sample_input.json",
         call_data
       );
-    //console.log(call_data);
-
-    //const verified = await snarkjs.groth16.verify(verification_key, publicSignals, proof, logger);
-    //if (!verified) throw new Error("Could not verify the proof");
 
     if (process.argv.length !== 3) {
       const templates = {};
       templates.groth16 = await fs.promises.readFile(cwd+"/templates/verifier_groth16.sol.ejs", "utf8");
-      //templates.plonk = await fs.promises.readFile(cwd+"/templates/verifier_plonk.sol.ejs", "utf8");  
-      //const template = cwd+"/templates/verifier_groth16.sol.ejs";
-      //console.log(templates);
-      //console.log(final_zkey);
+
       const path = cwd + "/" + wasmOutPath + "/" + snakeToCamel(circuitName) 
 
       fs.writeFileSync(
@@ -106,7 +99,7 @@ async function run() {
       const zkey_path = path + "/" + snakeToCamel(circuitName) + ".zkey";
 
       const circuit_sol = await snarkjs.zKey.exportSolidityVerifier(zkey_path, templates, logger);
-      //console.log(circuit_sol);
+
       fs.writeFileSync(
         path + "/" + snakeToCamel(circuitName) + ".wasm",
         wasm

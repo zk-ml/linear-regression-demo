@@ -7,7 +7,7 @@ This is a demo of the zkml protocol, which implements a zk-SNARK circuit where t
 ### Running
 
 * download `powersOfTau28_hez_final_18.ptau` from circom and move to `circuits`
-* `mkdir artifacts` to store artifacts
+* `mkdir artifacts && mkdir artifacts/lr` to store artifacts
 * `cd circuits && yarn prod` to build the circuits
 * `cd eth && yarn compile && yarn deploy-{NETWORK}` to deploy the contracts
 * set up Infura IPFS with `keys/ipfs.json` containing `{"id": ..., "secret": ...}`

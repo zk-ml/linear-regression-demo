@@ -31,7 +31,7 @@
     "solidity-coverage": "^0.7.16",
     "ipfs-http-client": "^52.0.2",
     "cids": "^1.1.8",
-    "axios": "^0.21.1"
+    "axios": "^0.21.2"
   },
   "scripts": {
     "compile": "npx hardhat compile",

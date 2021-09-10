@@ -4,6 +4,8 @@ _Truly private machine learning._
 
 This is a demo of the zkml protocol, which implements a zk-SNARK circuit where the proof verifies that a private model has a certain accuracy under a public dataset, as well as the public encrypted model is exactly the private model encrypted using the shared key. 
 
+Presentation: https://www.loom.com/share/fdbe451385dd4a22b5593bf80747a4be
+
 ### Running
 
 * download `powersOfTau28_hez_final_18.ptau` from circom and move to `circuits`
@@ -26,4 +28,4 @@ https://blockscout.com/xdai/mainnet/address/0x5B54f06991871cd7EAE76a3D270D9EFFBd
 ### Special Thanks
 
 * ETH Summer
-* zk-dungeon
+* zkd

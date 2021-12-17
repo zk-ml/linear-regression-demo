@@ -19,6 +19,8 @@ Presentation: https://www.loom.com/share/fdbe451385dd4a22b5593bf80747a4be
 
 ### Check it out on-chain
 
+**There is an outstanding 20 xDai bounty on the contract, available for claim as of December 2021.**
+
 https://blockscout.com/xdai/mainnet/address/0x5B54f06991871cd7EAE76a3D270D9EFFBdC01207/contracts
 
 ### Protocol Overview

@@ -30,4 +30,4 @@ https://blockscout.com/xdai/mainnet/address/0x5B54f06991871cd7EAE76a3D270D9EFFBd
 ### Special Thanks
 
 * ETH Summer
-* zkd
+* Lattice

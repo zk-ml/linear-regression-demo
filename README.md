@@ -1,6 +1,6 @@
-## zkml core
+## zkml demo
 
-_Truly private machine learning._
+_Private quantized linear regression on Ethereum._
 
 This is a demo of the zkml protocol, which implements a zk-SNARK circuit where the proof verifies that a private model has a certain accuracy under a public dataset, as well as the public encrypted model is exactly the private model encrypted using the shared key. 
 
